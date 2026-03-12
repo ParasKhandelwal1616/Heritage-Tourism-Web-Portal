@@ -4,20 +4,25 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, PlayCircle } from 'lucide-react';
 
-const Hero = () => {
+interface HeroProps {
+  videoUrl?: string;
+}
+
+const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-charcoal">
       {/* Immersive Video Placeholder */}
       <div className="absolute inset-0 z-0">
         <video
+          key={videoUrl}
           autoPlay
           loop
           muted
           playsInline
           className="w-full h-full object-cover scale-105 filter brightness-50"
         >
-          {/* Replace with your high-quality video URL */}
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-beautiful-landscape-of-the-mountains-and-the-lake-22442-large.mp4" type="video/mp4" />
+          {/* Using your high-quality local video background */}
+          <source src={videoUrl} type="video/mp4" />
         </video>
         {/* Overlay Gradients */}
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-charcoal/40 opacity-80" />
@@ -56,26 +61,9 @@ const Hero = () => {
             transition={{ delay: 1, duration: 0.8 }}
             className="max-w-2xl mx-auto text-lg md:text-2xl text-white/70 font-medium leading-relaxed font-sans"
           >
-            Experience the timeless beauty and vibrant culture of global heritage 
-            through our curated digital treasures and immersive world tours.
+            Experience the timeless beauty and vibrant culture of our heritage 
+            through our curated digital treasures and deep historical archives.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="pt-10 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8"
-          >
-            <button className="w-full sm:w-auto px-12 py-5 bg-white text-charcoal rounded-full font-bold text-lg hover:bg-saffron hover:text-white transition-all shadow-2xl active:scale-95 uppercase tracking-widest flex items-center justify-center">
-              Explore Now
-            </button>
-            <button className="flex items-center space-x-3 text-white group hover:text-emerald transition-colors font-bold uppercase tracking-widest">
-              <div className="p-4 bg-white/10 rounded-full backdrop-blur-md border border-white/20 group-hover:bg-emerald/20 transition-all">
-                <PlayCircle size={28} />
-              </div>
-              <span>Watch Story</span>
-            </button>
-          </motion.div>
         </motion.div>
       </div>
 

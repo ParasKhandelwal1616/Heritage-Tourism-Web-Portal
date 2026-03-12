@@ -1,59 +1,65 @@
 import { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import dbConnect from '@/lib/db';
-import User, { UserRole } from '@/models/User';
+import User from '@/models/User';
+import { UserRole } from '@/types/user';
+import bcrypt from 'bcryptjs';
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Email and Password are required.');
+        }
+
+        if (!credentials.email.endsWith('@mitsgwl.ac.in')) {
+          throw new Error('Only MITS email IDs (@mitsgwl.ac.in) are permitted.');
+        }
+
+        await dbConnect();
+        
+        const user = await User.findOne({ email: credentials.email });
+        if (!user || !user.password) {
+          throw new Error('Invalid email or password.');
+        }
+
+        const isValid = await bcrypt.compare(credentials.password, user.password);
+        if (!isValid) {
+          throw new Error('Invalid email or password.');
+        }
+
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          image: user.image,
+        };
+      }
     }),
   ],
   session: {
     strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days session persistence
   },
   callbacks: {
-    async signIn({ user, account, profile }) {
-      if (account?.provider === 'google') {
-        try {
-          await dbConnect();
-          const { email, name, image } = user;
-          
-          // Check if user exists in database, if not create them
-          let dbUser = await User.findOne({ email });
-          if (!dbUser) {
-            dbUser = await User.create({
-              email,
-              name,
-              image,
-              role: UserRole.STUDENT, // Default role
-            });
-          }
-          
-          // Add role to user object so it's available in the jwt callback
-          user.role = dbUser.role;
-          return true;
-        } catch (error) {
-          console.error('Error during sign in:', error);
-          return false;
-        }
-      }
-      return true;
-    },
-    async jwt({ token, user, trigger, session }) {
-      // Handle the initial sign-in and subsequent updates
+    async jwt({ token, user }) {
       if (user) {
+        token.id = user.id;
         token.role = user.role;
       }
-      
-      // If the session is updated manually (e.g., admin changing a role)
-      // we could re-fetch the role from the DB here if needed
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
+        session.user.id = token.id as string;
+        session.user.role = token.role as any;
       }
       return session;
     },

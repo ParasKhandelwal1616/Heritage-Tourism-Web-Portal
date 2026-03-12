@@ -2,9 +2,6 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
 export interface QuizQuestion {
   question: string;
   options: string[];
@@ -18,10 +15,14 @@ export interface HeritageAIResponse {
 }
 
 export async function getHeritageInfo(locationName: string): Promise<HeritageAIResponse | null> {
-  if (!process.env.GEMINI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
     console.error("GEMINI_API_KEY is not set");
     return null;
   }
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   const prompt = `
     You are a professional heritage guide. Provide a 3-sentence interesting history of "${locationName}" 

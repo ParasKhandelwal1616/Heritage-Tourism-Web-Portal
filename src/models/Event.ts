@@ -1,11 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { EventType } from '@/types/event';
 
-export enum EventType {
-  UPCOMING = 'UPCOMING',
-  PAST = 'PAST',
-}
-
-export interface IEvent extends Document {
+export interface IEventModel extends Document {
   title: string;
   description: string;
   date: Date;
@@ -36,4 +32,4 @@ const EventSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema);
+export default mongoose.models.Event || mongoose.model<IEventModel>('Event', EventSchema);

@@ -1,6 +1,6 @@
 import NextAuth, { DefaultSession } from "next-auth";
 import { JWT } from "next-auth/jwt";
-import { UserRole } from "@/models/User";
+import { UserRole } from "@/types/user";
 
 declare module "next-auth" {
   /**
@@ -10,11 +10,13 @@ declare module "next-auth" {
     user: {
       /** The user's role. */
       role: UserRole;
+      id: string;
     } & DefaultSession["user"]
   }
 
   interface User {
     role: UserRole;
+    id: string;
   }
 }
 
@@ -23,5 +25,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     /** The user's role. */
     role: UserRole;
+    id: string;
   }
 }

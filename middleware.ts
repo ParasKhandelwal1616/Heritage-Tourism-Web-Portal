@@ -1,6 +1,6 @@
 import { withAuth } from "next-auth/middleware";
 import { NextResponse } from "next/server";
-import { UserRole } from "./src/models/User";
+import { UserRole } from "./src/types/user";
 
 export default withAuth(
   function middleware(req) {
@@ -8,13 +8,13 @@ export default withAuth(
     const path = req.nextUrl.pathname;
 
     // Admin-only routes
-    if (path.startsWith("/admin") && token?.role !== UserRole.ADMIN) {
+    if (path.startsWith("/dashboard/admin") && token?.role !== UserRole.ADMIN) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
     // Manager and Admin routes
     if (
-      path.startsWith("/manager") &&
+      path.startsWith("/dashboard/manager") &&
       token?.role !== UserRole.ADMIN &&
       token?.role !== UserRole.MANAGER
     ) {
@@ -25,11 +25,17 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token, // Only allow authenticated users
+      authorized: ({ token }) => !!token,
     },
   }
 );
 
 export const config = {
-  matcher: ["/admin/:path*", "/manager/:path*", "/portal/:path*"],
+  matcher: [
+    "/dashboard/:path*", 
+    "/portal/:path*",
+    "/heritage-map/:path*",
+    "/events/:path*",
+    "/blogs/:path*"
+  ],
 };

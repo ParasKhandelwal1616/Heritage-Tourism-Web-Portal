@@ -11,10 +11,16 @@ const Footer = () => {
         
         {/* Brand Section */}
         <div className="space-y-6">
-          <Link href="/" className="flex items-center space-x-2">
-            <Landmark className="h-8 w-8 text-secondary" />
+          <Link href="/" className="flex items-center space-x-3">
+            <div className="w-10 h-10 overflow-hidden rounded-xl border border-secondary/20 shadow-lg">
+              <img 
+                src="/logo.jpeg" 
+                alt="Heritage & Tourism Club Logo" 
+                className="w-full h-full object-cover"
+              />
+            </div>
             <span className="font-serif text-2xl font-bold tracking-tight">
-              Heritage <span className="text-secondary">&</span> Tourism
+              Heritage <span className="text-secondary">& Tourism</span> Club
             </span>
           </Link>
           <p className="text-heritage-bg/70 leading-relaxed text-sm">
@@ -32,9 +38,8 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-bold mb-6 text-secondary">Explore</h3>
           <ul className="space-y-3">
-            <li><Link href="/sites" className="text-heritage-bg/80 hover:text-white transition-colors">Heritage Sites</Link></li>
-            <li><Link href="/tours" className="text-heritage-bg/80 hover:text-white transition-colors">Cultural Tours</Link></li>
-            <li><Link href="/blog" className="text-heritage-bg/80 hover:text-white transition-colors">Travel Blog</Link></li>
+            <li><Link href="/heritage-map" className="text-heritage-bg/80 hover:text-white transition-colors">Heritage Sites</Link></li>
+            <li><Link href="/blogs" className="text-heritage-bg/80 hover:text-white transition-colors">Travel Blog</Link></li>
             <li><Link href="/events" className="text-heritage-bg/80 hover:text-white transition-colors">Club Events</Link></li>
           </ul>
         </div>

@@ -59,8 +59,11 @@ const MapOverlay: React.FC<MapOverlayProps> = ({ location, onClose }) => {
               className="w-full h-full object-cover"
             />
             <button 
-              onClick={onClose}
-              className="absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-md hover:bg-white/40 transition-all rounded-full text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
+              className="absolute top-6 right-6 p-3 bg-white/20 backdrop-blur-md hover:bg-white/40 transition-all rounded-full text-white z-[120] cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -77,11 +80,25 @@ const MapOverlay: React.FC<MapOverlayProps> = ({ location, onClose }) => {
 
             {/* AI History Brief */}
             <div className="bg-ash rounded-3xl p-6 border border-black/5">
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="p-1.5 bg-saffron rounded-lg text-white">
-                  <Info size={16} />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <div className="p-1.5 bg-saffron rounded-lg text-white">
+                    <Info size={16} />
+                  </div>
+                  <h3 className="font-bold text-sm uppercase tracking-widest text-charcoal/80">AI Historical Guide</h3>
                 </div>
-                <h3 className="font-bold text-sm uppercase tracking-widest text-charcoal/80">AI Historical Guide</h3>
+                {!loading && aiData && (
+                  <button 
+                    onClick={() => {
+                      const utterance = new SpeechSynthesisUtterance(aiData.history);
+                      window.speechSynthesis.speak(utterance);
+                    }}
+                    className="p-2 bg-white rounded-xl text-saffron hover:bg-saffron hover:text-white transition-all shadow-sm border border-black/5 flex items-center space-x-2"
+                  >
+                    <div className="w-2 h-2 bg-saffron rounded-full animate-ping" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Listen</span>
+                  </button>
+                )}
               </div>
               
               {loading ? (

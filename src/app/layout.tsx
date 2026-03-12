@@ -21,7 +21,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Heritage Club | Explore India's Treasures",
+  title: "Heritage & Tourism Club | Explore India's Treasures",
   description: "Experience the timeless beauty and vibrant culture of global heritage.",
 };
 

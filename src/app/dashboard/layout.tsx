@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
+import { UserRole } from '@/types/user';
 import { 
   LayoutDashboard, 
   Calendar, 
@@ -13,7 +14,9 @@ import {
   Menu, 
   X, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  Map,
+  ShieldAlert
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -37,15 +40,36 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const menuItems = [
+  const userRole = session?.user?.role as string | undefined;
+  const isPrivileged = userRole === UserRole.ADMIN || userRole === UserRole.MANAGER;
+
+  // Regular user links
+  const coreMenu = [
     { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { href: '/dashboard/manager/events', label: 'Manage Events', icon: Calendar },
-    { href: '/dashboard/manager/blogs', label: 'Blog Posts', icon: BookOpen },
-    { href: '/dashboard/admin/users', label: 'User Directory', icon: Users, role: 'ADMIN' },
-    { href: '/dashboard/settings', label: 'Settings', icon: Settings },
+    { href: '/dashboard/blogs', label: 'Blog Posts', icon: BookOpen, role: [UserRole.MEMBER] },
   ];
 
-  const filteredMenu = menuItems.filter(item => !item.role || session?.user.role === item.role);
+  // Privileged links grouped under Portal
+  const managerMenu = [
+    { href: '/dashboard', label: 'System Overview', icon: LayoutDashboard },
+    { href: '/dashboard/manager/heritage', label: 'Manage Map', icon: Map },
+    { href: '/dashboard/manager/events', label: 'Manage Events', icon: Calendar },
+    { href: '/dashboard/manager/site', label: 'Site Settings', icon: ShieldAlert },
+    { href: '/dashboard/blogs', label: 'Manage Blogs', icon: BookOpen },
+    { href: '/dashboard/admin/users', label: 'User Directory', icon: Users },
+  ];
+
+  const settingsMenu = [
+    { href: '/dashboard/settings', label: 'Profile Settings', icon: Settings },
+  ];
+
+  const filterItems = (items: any[]) => items.filter(item => {
+    if (!item.role) return true;
+    if (!userRole) return false;
+    return Array.isArray(item.role) 
+      ? item.role.some((r: UserRole) => String(r) === String(userRole))
+      : String(item.role) === String(userRole);
+  });
 
   return (
     <div className="flex h-screen bg-ash overflow-hidden">
@@ -79,7 +103,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Sidebar Header */}
         <div className="p-8 border-b border-black/5 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-saffron rounded-lg" />
+            <div className="w-8 h-8 overflow-hidden rounded-lg shadow-sm border border-black/5">
+              <img src="/logo.jpeg" alt="Logo" className="w-full h-full object-cover" />
+            </div>
             <span className="font-serif font-black text-xl text-charcoal tracking-tight">Heritage<span className="text-saffron">CMS</span></span>
           </Link>
           <button onClick={() => setIsOpen(false)} className="lg:hidden text-charcoal/40 p-1">
@@ -88,29 +114,63 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Navigation Section */}
-        <nav className="flex-grow pt-8">
-          <p className="px-8 text-[10px] font-black text-charcoal/30 uppercase tracking-[0.3em] mb-4">Core Navigation</p>
-          <div className="flex flex-col space-y-1">
-            {filteredMenu.map((item) => (
-              <SidebarLink 
-                key={item.href} 
-                {...item} 
-                active={pathname === item.href} 
-              />
-            ))}
+        <div className="flex-grow overflow-y-auto pt-8 pb-4">
+          <div className="space-y-8">
+            {/* Core Navigation - Hidden for Privileged Users to simplify */}
+            {!isPrivileged && (
+              <div>
+                <p className="px-8 text-[10px] font-black text-charcoal/30 uppercase tracking-[0.3em] mb-4">Navigation</p>
+                <div className="flex flex-col space-y-1">
+                  {filterItems(coreMenu).map((item) => (
+                    <SidebarLink key={item.href} {...item} active={pathname === item.href} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Manager Portal Section - THE ONLY POWER SOURCE for Managers/Admins */}
+            {isPrivileged && (
+              <div>
+                <p className="px-8 text-[10px] font-black text-emerald uppercase tracking-[0.3em] mb-4 flex items-center">
+                  <span>Manager Portal</span>
+                  <div className="ml-2 h-1 flex-grow bg-emerald/10 rounded-full" />
+                </p>
+                <div className="flex flex-col space-y-1">
+                  {managerMenu.map((item) => (
+                    <SidebarLink key={item.href} {...item} active={pathname === item.href} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Settings */}
+            <div>
+              <p className="px-8 text-[10px] font-black text-charcoal/30 uppercase tracking-[0.3em] mb-4">Account</p>
+              <div className="flex flex-col space-y-1">
+                {settingsMenu.map((item) => (
+                  <SidebarLink key={item.href} {...item} active={pathname === item.href} />
+                ))}
+              </div>
+            </div>
           </div>
-        </nav>
+        </div>
 
         {/* Sidebar Footer */}
         <div className="p-8 border-t border-black/5 bg-ash/30">
           <div className="flex items-center space-x-3 mb-6">
-            <img src={session?.user.image || ''} className="w-10 h-10 rounded-xl object-cover" />
+            <img 
+              src={session?.user.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(session?.user.name || 'User') + '&background=random'} 
+              className="w-10 h-10 rounded-xl object-cover" 
+            />
             <div className="overflow-hidden">
               <p className="text-sm font-bold text-charcoal truncate">{session?.user.name}</p>
               <p className="text-[10px] font-black text-emerald uppercase tracking-widest">{session?.user.role}</p>
             </div>
           </div>
-          <button className="flex items-center space-x-3 text-red-500 hover:text-red-600 font-bold text-sm transition-colors">
+          <button 
+            onClick={() => signOut()}
+            className="flex items-center space-x-3 text-red-500 hover:text-red-600 font-bold text-sm transition-colors"
+          >
             <LogOut size={18} />
             <span>Sign Out</span>
           </button>
