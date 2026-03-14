@@ -181,8 +181,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </motion.aside>
 
       {/* Main Content Area */}
-      <main className="flex-grow h-full overflow-y-auto scroll-smooth bg-ash/50 p-6 md:p-12 lg:p-16">
-        {children}
+      <main className="flex-grow h-full overflow-y-auto scroll-smooth bg-ash/50 p-4 md:p-8 lg:p-12 xl:p-16">
+        <div className="max-w-7xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

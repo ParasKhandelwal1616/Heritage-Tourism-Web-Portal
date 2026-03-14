@@ -34,13 +34,13 @@ const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
-          className="space-y-8"
+          className="space-y-6 md:space-y-8"
         >
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="inline-block text-saffron uppercase tracking-[0.4em] text-sm font-bold bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/20"
+            className="inline-block text-saffron uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] md:text-sm font-bold bg-white/10 backdrop-blur-md px-4 md:px-6 py-2 rounded-full border border-white/20"
           >
             Journey through history
           </motion.span>
@@ -49,9 +49,9 @@ const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7, duration: 1 }}
-            className="font-serif text-6xl md:text-8xl lg:text-9xl text-white font-black leading-[0.95] drop-shadow-2xl"
+            className="font-serif text-4xl sm:text-6xl md:text-8xl lg:text-9xl text-white font-black leading-[1.1] md:leading-[0.95] drop-shadow-2xl"
           >
-            Discover Our <br />
+            Discover Our <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-saffron to-emerald italic">Heritage</span>
           </motion.h1>
 
@@ -59,7 +59,7 @@ const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="max-w-2xl mx-auto text-lg md:text-2xl text-white/70 font-medium leading-relaxed font-sans"
+            className="max-w-2xl mx-auto text-base md:text-xl lg:text-2xl text-white/70 font-medium leading-relaxed font-sans"
           >
             Experience the timeless beauty and vibrant culture of our heritage 
             through our curated digital treasures and deep historical archives.
@@ -71,11 +71,11 @@ const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
       <motion.div
         animate={{ y: [0, 15, 0] }}
         transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center space-y-2 cursor-pointer"
+        className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center space-y-2 cursor-pointer"
       >
-        <span className="text-white/40 uppercase tracking-[0.2em] text-[10px] font-bold">Scroll Down</span>
-        <div className="w-[1px] h-12 bg-gradient-to-b from-white to-transparent" />
-        <ChevronDown className="text-saffron w-5 h-5" />
+        <span className="text-white/40 uppercase tracking-[0.2em] text-[8px] md:text-[10px] font-bold">Scroll Down</span>
+        <div className="w-[1px] h-8 md:h-12 bg-gradient-to-b from-white to-transparent" />
+        <ChevronDown className="text-saffron w-4 h-4 md:w-5 md:h-5" />
       </motion.div>
     </section>
   );

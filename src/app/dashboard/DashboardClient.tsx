@@ -22,20 +22,20 @@ import { updateHeroVideo } from '@/app/actions/site';
 const OverviewCard = ({ title, value, icon: Icon, change, color }: { title: string; value: string | number; icon: any; change: string, color: string }) => (
   <motion.div 
     whileHover={{ y: -8 }}
-    className="bg-white p-8 rounded-[2.5rem] shadow-2xl shadow-charcoal/5 border border-black/5 flex flex-col justify-between"
+    className="bg-white p-6 md:p-8 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl shadow-charcoal/5 border border-black/5 flex flex-col justify-between h-full"
   >
-    <div className="flex items-center justify-between mb-8">
-      <div className={`p-4 rounded-2xl ${color}`}>
+    <div className="flex items-center justify-between mb-6 md:mb-8">
+      <div className={`p-3 md:p-4 rounded-2xl ${color}`}>
         <Icon size={24} />
       </div>
-      <div className="flex items-center space-x-1 text-emerald font-bold text-xs uppercase tracking-widest bg-emerald/5 px-3 py-1 rounded-full">
+      <div className="flex items-center space-x-1 text-emerald font-bold text-[10px] md:text-xs uppercase tracking-widest bg-emerald/5 px-2 md:px-3 py-1 rounded-full">
         <TrendingUp size={12} />
         <span>{change}</span>
       </div>
     </div>
     <div>
-      <h3 className="text-4xl font-serif font-black text-charcoal mb-1">{value}</h3>
-      <p className="text-xs font-black text-charcoal/40 uppercase tracking-[0.2em]">{title}</p>
+      <h3 className="text-3xl md:text-4xl font-serif font-black text-charcoal mb-1">{value}</h3>
+      <p className="text-[10px] md:text-xs font-black text-charcoal/40 uppercase tracking-[0.2em]">{title}</p>
     </div>
   </motion.div>
 );
@@ -72,7 +72,7 @@ export default function DashboardClient({ stats }: { stats: any }) {
   };
 
   const renderAdminStats = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
       <OverviewCard title="Total Users" value={stats.totalUsers} icon={Users} change="+18%" color="bg-blue-50 text-blue-600" />
       <OverviewCard title="Site Traffic" value={`${(stats.siteTraffic / 1000).toFixed(1)}K`} icon={Zap} change="+12%" color="bg-yellow-50 text-yellow-600" />
       <OverviewCard title="Active Blogs" value={stats.activeBlogs} icon={BookOpen} change="+5%" color="bg-emerald-50 text-emerald-600" />
@@ -81,44 +81,45 @@ export default function DashboardClient({ stats }: { stats: any }) {
   );
 
   const renderManagerStats = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       <OverviewCard title="Total Events" value={stats.totalEvents} icon={Calendar} change="+2" color="bg-emerald-50 text-emerald-600" />
       <OverviewCard title="Active Blogs" value={stats.activeBlogs} icon={BookOpen} change="+4" color="bg-saffron/10 text-saffron" />
     </div>
   );
 
   const renderStudentStats = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       <OverviewCard title="Points Earned" value="1,250" icon={Star} change="+150" color="bg-yellow-50 text-yellow-600" />
+      <OverviewCard title="Visits Recorded" value="8" icon={Map} change="+2" color="bg-blue-50 text-blue-600" />
       <OverviewCard title="Quizzes Taken" value="24" icon={Globe} change="+3" color="bg-emerald-50 text-emerald-600" />
     </div>
   );
 
   return (
-    <div className="space-y-12">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="space-y-10 md:space-y-16">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
         <div>
-          <span className="text-saffron font-black uppercase tracking-[0.4em] text-[10px] mb-2 block">
+          <span className="text-saffron font-black uppercase tracking-[0.2em] md:tracking-[0.4em] text-[10px] mb-2 block">
             {role} Control Panel
           </span>
-          <h2 className="font-serif text-5xl font-black text-charcoal leading-tight">
+          <h2 className="font-serif text-4xl md:text-6xl font-black text-charcoal leading-tight">
             Welcome, <span className="text-emerald italic">{session?.user?.name?.split(' ')[0]}</span>
           </h2>
         </div>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-3 md:gap-4">
           {role === 'ADMIN' && (
-            <Link href="/dashboard/admin/users" className="flex items-center space-x-3 bg-charcoal text-white px-8 py-4 rounded-2xl font-bold text-base hover:bg-emerald transition-all shadow-xl shadow-charcoal/20 active:scale-95 group">
+            <Link href="/dashboard/admin/users" className="flex items-center space-x-3 bg-charcoal text-white px-6 md:px-10 py-3 md:py-5 rounded-xl md:rounded-2xl font-bold text-sm md:text-lg hover:bg-emerald transition-all shadow-xl shadow-charcoal/20 active:scale-95 group">
               <span>User Directory</span>
-              <ShieldCheck size={18} />
+              <ShieldCheck size={20} />
             </Link>
           )}
           {(role === 'MANAGER' || role === 'ADMIN') && (
             <>
-              <Link href="/dashboard/manager/events" className="flex items-center space-x-3 bg-emerald text-white px-8 py-4 rounded-2xl font-bold text-base hover:bg-charcoal transition-all shadow-xl shadow-emerald/20 active:scale-95 group">
+              <Link href="/dashboard/manager/events" className="flex items-center space-x-2 md:space-x-3 bg-emerald text-white px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-base hover:bg-charcoal transition-all shadow-xl shadow-emerald/20 active:scale-95 group">
                 <span>Manage Events</span>
                 <Calendar size={18} />
               </Link>
-              <Link href="/dashboard/manager/blogs" className="flex items-center space-x-3 bg-blue-600 text-white px-8 py-4 rounded-2xl font-bold text-base hover:bg-charcoal transition-all shadow-xl shadow-blue-600/20 active:scale-95 group">
+              <Link href="/dashboard/manager/blogs" className="flex items-center space-x-2 md:space-x-3 bg-blue-600 text-white px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-base hover:bg-charcoal transition-all shadow-xl shadow-blue-600/20 active:scale-95 group">
                 <span>Manage Blogs</span>
                 <BookOpen size={18} />
               </Link>
@@ -132,7 +133,7 @@ export default function DashboardClient({ stats }: { stats: any }) {
               <button 
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isUpdatingVideo}
-                className="flex items-center space-x-3 bg-saffron text-white px-8 py-4 rounded-2xl font-bold text-base hover:bg-charcoal transition-all shadow-xl shadow-saffron/20 active:scale-95 group disabled:opacity-50"
+                className="flex items-center space-x-2 md:space-x-3 bg-saffron text-white px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-base hover:bg-charcoal transition-all shadow-xl shadow-saffron/20 active:scale-95 group disabled:opacity-50"
               >
                 {isUpdatingVideo ? (
                   <Loader2 size={18} className="animate-spin" />
@@ -146,27 +147,29 @@ export default function DashboardClient({ stats }: { stats: any }) {
         </div>
       </div>
 
-      {role === 'ADMIN' && renderAdminStats()}
-      {role === 'MANAGER' && renderManagerStats()}
-      {(role === 'MEMBER' || role === 'STUDENT') && renderStudentStats()}
+      <section>
+        {role === 'ADMIN' && renderAdminStats()}
+        {role === 'MANAGER' && renderManagerStats()}
+        {(role === 'MEMBER' || role === 'STUDENT') && renderStudentStats()}
+      </section>
 
       {/* Role-Specific Actions Section */}
-      <section className="bg-white rounded-[3rem] p-12 border border-black/5 shadow-2xl shadow-charcoal/5 overflow-hidden relative">
+      <section className="bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 border border-black/5 shadow-2xl shadow-charcoal/5 overflow-hidden relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-saffron/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="flex items-center justify-between mb-12 relative z-10">
-          <h3 className="font-serif text-3xl font-black text-charcoal">Quick <span className="text-saffron">Actions</span></h3>
+        <div className="flex items-center justify-between mb-8 md:mb-12 relative z-10">
+          <h3 className="font-serif text-2xl md:text-3xl font-black text-charcoal">Quick <span className="text-saffron">Actions</span></h3>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-           <Link href="/events" className="p-6 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl hover:shadow-charcoal/5 transition-all">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 relative z-10">
+           <Link href="/events" className="p-6 md:p-8 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl hover:shadow-charcoal/5 transition-all">
               <Calendar className="text-emerald mb-4" size={24} />
               <p className="font-bold text-charcoal">View Upcoming Events</p>
-              <p className="text-xs text-charcoal/40 font-medium">Join club expeditions</p>
+              <p className="text-[10px] md:text-xs text-charcoal/40 font-medium">Join club expeditions</p>
            </Link>
-           <Link href="/blogs" className="p-6 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl hover:shadow-charcoal/5 transition-all">
+           <Link href="/blogs" className="p-6 md:p-8 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl hover:shadow-charcoal/5 transition-all">
               <BookOpen className="text-blue-500 mb-4" size={24} />
               <p className="font-bold text-charcoal">Read Member Blogs</p>
-              <p className="text-xs text-charcoal/40 font-medium">Learn from the community</p>
+              <p className="text-[10px] md:text-xs text-charcoal/40 font-medium">Learn from the community</p>
            </Link>
         </div>
       </section>
