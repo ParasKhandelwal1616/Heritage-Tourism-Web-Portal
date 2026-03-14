@@ -174,7 +174,7 @@ export default function SignInPage() {
               <label className="text-[10px] font-black text-charcoal/40 uppercase tracking-[0.2em] ml-4">MITS Email ID</label>
               <div className="relative group">
                 <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-charcoal/30 group-focus-within:text-saffron transition-colors" size={18} />
-                <input name="email" type="email" required placeholder="23cd10pa41@mitsgwl.ac.in" className="w-full h-16 bg-ash group-hover:bg-white transition-all rounded-3xl border border-black/5 outline-none pl-16 pr-6 font-bold focus:border-saffron shadow-inner" />
+                <input name="email" type="email" required placeholder="example@mitsgwl.ac.in" className="w-full h-16 bg-ash group-hover:bg-white transition-all rounded-3xl border border-black/5 outline-none pl-16 pr-6 font-bold focus:border-saffron shadow-inner" />
               </div>
             </div>
 
