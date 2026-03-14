@@ -155,59 +155,111 @@ const Navbar = ({ settings }: { settings: any }) => {
         {/* Mobile Toggle */}
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={`lg:hidden p-2 rounded-xl backdrop-blur-md transition-colors ${
-            shouldShowSolid ? 'bg-charcoal/5 text-charcoal' : 'bg-white/20 text-white'
+          className={`lg:hidden p-3 rounded-2xl transition-all duration-300 z-[110] ${
+            isMobileMenuOpen 
+              ? 'bg-charcoal text-white shadow-xl rotate-90' 
+              : shouldShowSolid 
+                ? 'bg-charcoal/5 text-charcoal' 
+                : 'bg-white/20 text-white backdrop-blur-md'
           }`}
         >
-          {isMobileMenuOpen ? <X /> : <Menu />}
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            className="fixed inset-0 z-[90] bg-white lg:hidden pt-24 px-6"
-          >
-            <div className="flex flex-col space-y-8">
-              {menuItems.map((menu) => (
-                <Link 
-                  key={menu.name}
-                  href={menu.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center space-x-3 text-2xl font-serif font-black text-charcoal group"
-                >
-                  <div className="p-3 bg-ash rounded-2xl group-hover:bg-saffron/10 group-hover:text-saffron transition-all">
-                    {menu.icon}
-                  </div>
-                  <span>{menu.name}</span>
-                </Link>
-              ))}
-              <div className="pt-8 border-t border-black/5">
-                {status === 'authenticated' ? (
+          <>
+            {/* Dark Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-charcoal/20 backdrop-blur-sm z-[80] lg:hidden"
+            />
+            
+            {/* Menu Content */}
+            <motion.div
+              initial={{ opacity: 0, x: '100%' }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 right-0 w-[85%] max-w-sm z-[90] bg-white/95 backdrop-blur-2xl shadow-2xl lg:hidden pt-24 px-8 border-l border-black/5"
+            >
+              <div className="flex flex-col space-y-8">
+                <div className="pb-4 border-b border-black/5">
+                  <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em]">Main Menu</span>
+                </div>
+                {menuItems.map((menu) => (
                   <Link 
-                    href="/dashboard"
+                    key={menu.name}
+                    href={menu.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-center space-x-3 bg-charcoal text-white py-5 rounded-2xl font-bold uppercase tracking-widest"
+                    className="flex items-center justify-between group"
                   >
-                    <LayoutDashboard size={20} />
-                    <span>Go to Dashboard</span>
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-ash rounded-2xl group-hover:bg-saffron/10 group-hover:text-saffron transition-all">
+                        {menu.icon}
+                      </div>
+                      <span className="text-2xl font-serif font-black text-charcoal">{menu.name}</span>
+                    </div>
+                    <div className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all">
+                      <ChevronDown className="w-4 h-4 text-saffron -rotate-90" />
+                    </div>
                   </Link>
-                ) : (
-                  <Link 
-                    href="/auth/signin"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="w-full flex items-center justify-center bg-saffron text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-saffron/20"
-                  >
-                    Sign In to Club
-                  </Link>
-                )}
+                ))}
+                
+                <div className="pt-8 border-t border-black/5 space-y-4">
+                  <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em] block mb-4">Account</span>
+                  {status === 'authenticated' ? (
+                    <>
+                      <div className="flex items-center space-x-4 p-4 bg-ash rounded-2xl mb-4">
+                        <img 
+                          src={session.user?.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(session.user?.name || 'User')} 
+                          className="w-12 h-12 rounded-full border-2 border-saffron"
+                          alt="Profile"
+                        />
+                        <div>
+                          <p className="font-bold text-charcoal">{session.user?.name}</p>
+                          <p className="text-[10px] font-black text-emerald uppercase">{session.user?.role}</p>
+                        </div>
+                      </div>
+                      <Link 
+                        href="/dashboard"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center justify-center space-x-3 bg-charcoal text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-charcoal/20 active:scale-95 transition-transform"
+                      >
+                        <LayoutDashboard size={20} />
+                        <span>Dashboard</span>
+                      </Link>
+                      <button 
+                        onClick={() => signOut()}
+                        className="w-full flex items-center justify-center space-x-3 bg-red-50 text-red-500 py-5 rounded-2xl font-bold uppercase tracking-widest active:scale-95 transition-transform"
+                      >
+                        <LogOut size={20} />
+                        <span>Sign Out</span>
+                      </button>
+                    </>
+                  ) : (
+                    <Link 
+                      href="/auth/signin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-center bg-saffron text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-saffron/20 active:scale-95 transition-transform"
+                    >
+                      Sign In to Club
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
-          </motion.div>
+
+              {/* Decorative background element */}
+              <div className="absolute bottom-10 left-8 right-8 text-center opacity-10 pointer-events-none">
+                <p className="font-serif italic text-4xl">Heritage</p>
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </nav>
