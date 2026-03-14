@@ -15,7 +15,8 @@ export default async function LandingPage() {
     title: site.name,
     location: `${site.position[0].toFixed(2)}, ${site.position[1].toFixed(2)}`,
     category: site.category,
-    description: site.description
+    description: site.description,
+    wikipediaUrl: `https://en.wikipedia.org/wiki/${encodeURIComponent(site.name)}`
   }));
   
   // Fallback destinations if none in DB
@@ -25,28 +26,32 @@ export default async function LandingPage() {
       title: 'Taj Mahal',
       location: 'Agra, India',
       category: 'Wonders of the World',
-      description: 'An ivory-white marble mausoleum on the south bank of the Yamuna river.'
+      description: 'An ivory-white marble mausoleum on the south bank of the Yamuna river.',
+      wikipediaUrl: 'https://en.wikipedia.org/wiki/Taj_Mahal'
     },
     {
       image: 'https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&q=80&w=2070',
       title: 'Jaipur Forts',
       location: 'Rajasthan, India',
       category: 'Royal Heritage',
-      description: 'The majestic Amer Fort, perched high on a hill, is a major tourist attraction.'
+      description: 'The majestic Amer Fort, perched high on a hill, is a major tourist attraction.',
+      wikipediaUrl: 'https://en.wikipedia.org/wiki/Amer_Fort'
     },
     {
       image: 'https://images.unsplash.com/photo-1561043433-9265f73e685f?auto=format&fit=crop&q=80&w=2070',
       title: 'Varanasi Ghats',
       location: 'Uttar Pradesh, India',
       category: 'Spiritual Heritage',
-      description: 'The spiritual heart of India, where life and death converge on the banks of the Ganges.'
+      description: 'The spiritual heart of India, where life and death converge on the banks of the Ganges.',
+      wikipediaUrl: 'https://en.wikipedia.org/wiki/Ghats_in_Varanasi'
     },
     {
       image: 'https://images.unsplash.com/photo-1627894483216-2138af692e32?auto=format&fit=crop&q=80&w=2070',
       title: 'Hampi Ruins',
       location: 'Karnataka, India',
       category: 'UNESCO Sites',
-      description: 'Explore the spectacular ruins of the Vijayanagara Empire across a surreal landscape.'
+      description: 'Explore the spectacular ruins of the Vijayanagara Empire across a surreal landscape.',
+      wikipediaUrl: 'https://en.wikipedia.org/wiki/Hampi'
     }
   ];
 

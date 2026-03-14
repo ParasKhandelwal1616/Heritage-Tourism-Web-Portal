@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 
 interface DestinationCardProps {
   image: string;
@@ -10,6 +11,7 @@ interface DestinationCardProps {
   location: string;
   category: string;
   description: string;
+  wikipediaUrl?: string;
 }
 
 const DestinationCard: React.FC<DestinationCardProps> = ({ 
@@ -17,7 +19,8 @@ const DestinationCard: React.FC<DestinationCardProps> = ({
   title, 
   location, 
   category, 
-  description 
+  description,
+  wikipediaUrl
 }) => {
   return (
     <motion.div
@@ -60,12 +63,17 @@ const DestinationCard: React.FC<DestinationCardProps> = ({
         </p>
 
         <div className="flex items-center justify-between">
-          <button className="flex items-center space-x-2 text-white font-black uppercase tracking-widest text-xs group/btn">
+          <Link 
+            href={wikipediaUrl || `https://en.wikipedia.org/wiki/${encodeURIComponent(title)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-2 text-white font-black uppercase tracking-widest text-xs group/btn"
+          >
             <span>Explore Site</span>
             <div className="p-2 bg-white/20 rounded-full group-hover/btn:bg-saffron transition-all duration-300">
               <ArrowUpRight size={14} />
             </div>
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>
