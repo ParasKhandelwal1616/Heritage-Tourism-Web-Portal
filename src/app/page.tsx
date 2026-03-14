@@ -2,6 +2,8 @@ import React from 'react';
 import LandingClient from '@/components/layout/LandingClient';
 import { getHeroVideo, getPublicStats, getAllHeritageSites } from '@/app/actions/site';
 
+export const dynamic = 'force-dynamic';
+
 export default async function LandingPage() {
   const videoUrl = await getHeroVideo();
   const stats = await getPublicStats();

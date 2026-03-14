@@ -84,7 +84,7 @@ const Footer = ({ settings }: { settings: any }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-heritage-bg/40 text-xs">
         <p>&copy; {currentYear} {clubName}. All rights reserved.</p>
-        <p className="mt-2 italic font-serif">"Honoring the past, inspiring the future."</p>
+        <p className="mt-2 italic font-serif">&quot;Honoring the past, inspiring the future.&quot;</p>
       </div>
     </footer>
   );

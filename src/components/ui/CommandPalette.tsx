@@ -71,7 +71,7 @@ const CommandPalette = () => {
                 <Command.List className="p-4 max-h-[60vh] overflow-y-auto scroll-smooth">
                   <Command.Empty className="py-20 text-center flex flex-col items-center">
                     <Landmark size={48} className="text-charcoal/10 mb-4" />
-                    <p className="text-charcoal/40 font-black uppercase tracking-widest text-sm italic">"No heritage found with that name..."</p>
+                    <p className="text-charcoal/40 font-black uppercase tracking-widest text-sm italic">&quot;No heritage found with that name...&quot;</p>
                   </Command.Empty>
 
                   <Command.Group heading={<span className="px-4 text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em] mb-2 block">Quick Navigation</span>}>
