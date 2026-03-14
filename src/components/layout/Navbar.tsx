@@ -167,7 +167,7 @@ const Navbar = ({ settings }: { settings: any }) => {
         {/* Mobile Toggle */}
         <button 
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className={`lg:hidden p-3 rounded-2xl transition-all duration-300 z-[110] ${
+          className={`lg:hidden p-3 rounded-2xl transition-all duration-300 z-[1100] ${
             isMobileMenuOpen 
               ? 'bg-charcoal text-white shadow-xl rotate-90' 
               : shouldShowSolid 
@@ -189,7 +189,7 @@ const Navbar = ({ settings }: { settings: any }) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-charcoal/20 backdrop-blur-sm z-[80] lg:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[998] lg:hidden"
             />
             
             {/* Menu Content */}
@@ -198,9 +198,12 @@ const Navbar = ({ settings }: { settings: any }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 w-[85%] max-w-sm z-[90] bg-white shadow-2xl lg:hidden pt-24 px-8 border-l border-black/5"
+              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm z-[1000] bg-white lg:hidden pt-24 px-8 border-l border-black/5 flex flex-col shadow-[[-20px_0_60px_-15px_rgba(0,0,0,0.3)]]"
             >
-              <div className="flex flex-col space-y-8">
+              {/* Force Solid background layer */}
+              <div className="absolute inset-0 bg-white -z-10" />
+
+              <div className="flex flex-col space-y-8 overflow-y-auto pb-10 relative z-10">
                 <div className="pb-4 border-b border-black/5">
                   <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em]">Main Menu</span>
                 </div>
