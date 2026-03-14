@@ -50,10 +50,10 @@ export default function DashboardClient({ stats }: { stats: any }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Vercel Serverless Function limit is 4.5MB
-    const MAX_FILE_SIZE = 4.5 * 1024 * 1024; 
+    // Increased limit to 100MB
+    const MAX_FILE_SIZE = 100 * 1024 * 1024; 
     if (file.size > MAX_FILE_SIZE) {
-      alert(`File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Vercel deployment limit is 4.5MB. Please upload a smaller video or use Vercel Blob storage.`);
+      alert(`File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Limit is 100MB. Note: Vercel standard plan may still block uploads over 4.5MB.`);
       if (videoInputRef.current) videoInputRef.current.value = '';
       return;
     }
