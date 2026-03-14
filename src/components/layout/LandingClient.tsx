@@ -38,7 +38,7 @@ const LandingClient = ({ destinations, videoUrl, stats }: LandingClientProps) =>
             Featured <span className="text-emerald italic">Destinations</span>
           </h2>
           <p className="max-w-2xl mx-auto text-charcoal/60 text-base md:text-xl font-medium">
-            Explore our handpicked collection of India's most breathtaking 
+            Explore our handpicked collection of India&apos;s most breathtaking 
             historical landmarks and cultural sanctuaries.
           </p>
         </motion.div>
@@ -64,14 +64,14 @@ const LandingClient = ({ destinations, videoUrl, stats }: LandingClientProps) =>
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 lg:gap-8">
             {[
-              { icon: <Compass className="text-saffron" />, value: `${stats.totalEvents}+`, label: 'Events' },
-              { icon: <Landmark className="text-emerald" />, value: `${stats.totalSites}+`, label: 'Sites' },
-              { icon: <Users className="text-saffron" />, value: stats.totalUsers >= 1000 ? `${(stats.totalUsers/1000).toFixed(1)}K` : stats.totalUsers, label: 'Members' },
-              { icon: <Heart className="text-emerald" />, value: `${stats.joyRate}%`, label: 'Joy Rate' }
+              { icon: Compass, color: "text-saffron", value: `${stats.totalEvents}+`, label: 'Events' },
+              { icon: Landmark, color: "text-emerald", value: `${stats.totalSites}+`, label: 'Sites' },
+              { icon: Users, color: "text-saffron", value: stats.totalUsers >= 1000 ? `${(stats.totalUsers/1000).toFixed(1)}K` : stats.totalUsers, label: 'Members' },
+              { icon: Heart, color: "text-emerald", value: `${stats.joyRate}%`, label: 'Joy Rate' }
             ].map((stat, idx) => (
               <div key={idx} className="text-center group">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-4 md:mb-6 shadow-xl shadow-black/5 group-hover:scale-110 transition-transform">
-                  {React.cloneElement(stat.icon as React.ReactElement, { size: 24 })}
+                  <stat.icon className={stat.color} size={24} />
                 </div>
                 <h4 className="text-2xl md:text-4xl font-serif font-black text-charcoal mb-1 md:mb-2">{stat.value}</h4>
                 <p className="text-charcoal/40 text-[8px] md:text-xs font-black uppercase tracking-[0.2em]">{stat.label}</p>

@@ -20,7 +20,7 @@ export default function ForbiddenPage() {
         </div>
 
         <p className="text-charcoal/60 font-medium italic">
-          "Access to this sacred chamber is restricted to the guardians of our heritage. You do not possess the necessary artifacts (roles) to proceed."
+          &quot;Access to this sacred chamber is restricted to the guardians of our heritage. You do not possess the necessary artifacts (roles) to proceed.&quot;
         </p>
 
         <div className="pt-4 flex flex-col space-y-4">

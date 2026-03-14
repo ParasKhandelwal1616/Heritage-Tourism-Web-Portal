@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { SiteType, SiteScale, SiteStatus, IHeritageSite as IHeritageSiteBase } from '@/types/heritage';
 
-export interface IHeritageSite extends Document, IHeritageSiteBase {}
+export interface IHeritageSite extends Document, Omit<IHeritageSiteBase, '_id'> {}
 
 const HeritageSiteSchema: Schema = new Schema(
   {
