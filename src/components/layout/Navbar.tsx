@@ -186,7 +186,7 @@ const Navbar = ({ settings }: { settings: any }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 right-0 w-[85%] max-w-sm z-[90] bg-white/95 backdrop-blur-2xl shadow-2xl lg:hidden pt-24 px-8 border-l border-black/5"
+              className="fixed inset-y-0 right-0 w-[85%] max-w-sm z-[90] bg-white shadow-2xl lg:hidden pt-24 px-8 border-l border-black/5"
             >
               <div className="flex flex-col space-y-8">
                 <div className="pb-4 border-b border-black/5">
