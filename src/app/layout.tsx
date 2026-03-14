@@ -24,6 +24,10 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Heritage & Tourism Club | Explore India's Treasures",
   description: "Experience the timeless beauty and vibrant culture of global heritage.",
+  icons: {
+    icon: '/logo.jpeg',
+    apple: '/logo.jpeg',
+  },
 };
 
 export default async function RootLayout({
