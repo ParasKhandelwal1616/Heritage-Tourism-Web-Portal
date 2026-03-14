@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 import CommandPalette from '@/components/ui/CommandPalette';
 
 const Navbar = ({ settings }: { settings: any }) => {
