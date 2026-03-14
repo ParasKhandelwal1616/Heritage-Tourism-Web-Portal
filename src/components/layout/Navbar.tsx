@@ -182,23 +182,23 @@ const Navbar = ({ settings }: { settings: any }) => {
       {/* Mobile Menu Overlay */}
       <AnimatePresence>
         {isMobileMenuOpen && (
-          <>
+          <div className="fixed inset-0 z-[99999] lg:hidden">
             {/* Dark Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[998] lg:hidden"
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             
             {/* Menu Content */}
             <motion.div
-              initial={{ opacity: 0, x: '100%' }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: '100%' }}
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[85%] max-w-sm z-[1000] bg-white lg:hidden pt-24 px-8 border-l border-black/5 flex flex-col shadow-[[-20px_0_60px_-15px_rgba(0,0,0,0.3)]]"
+              className="absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.2)] flex flex-col pt-24 px-8"
             >
               {/* Force Solid background layer */}
               <div className="absolute inset-0 bg-white -z-10" />
@@ -274,7 +274,7 @@ const Navbar = ({ settings }: { settings: any }) => {
                 <p className="font-serif italic text-4xl">Heritage</p>
               </div>
             </motion.div>
-          </>
+          </div>
         )}
       </AnimatePresence>
     </nav>
