@@ -50,6 +50,14 @@ export default function DashboardClient({ stats }: { stats: any }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Vercel Serverless Function limit is 4.5MB
+    const MAX_FILE_SIZE = 4.5 * 1024 * 1024; 
+    if (file.size > MAX_FILE_SIZE) {
+      alert(`File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Vercel deployment limit is 4.5MB. Please upload a smaller video or use Vercel Blob storage.`);
+      if (videoInputRef.current) videoInputRef.current.value = '';
+      return;
+    }
+
     if (!confirm('This will update the main hero video on the home screen. Continue?')) return;
 
     setIsUpdatingVideo(true);

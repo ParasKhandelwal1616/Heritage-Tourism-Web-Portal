@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   /* config options here */
   experimental: {
     serverActions: {
-      bodySizeLimit: '2gb',
+      bodySizeLimit: '10mb',
     },
   },
   typescript: {
