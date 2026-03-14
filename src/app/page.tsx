@@ -22,7 +22,7 @@ export default async function LandingPage() {
   // Fallback destinations if none in DB
   const fallbackDestinations = [
     {
-      image: 'https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&q=80&w=2073',
+      image: 'https://en.wikipedia.org/wiki/File:Taj_Mahal_(Edited).jpeg',
       title: 'Taj Mahal',
       location: 'Agra, India',
       category: 'Wonders of the World',

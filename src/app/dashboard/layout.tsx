@@ -73,33 +73,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   });
 
   return (
-    <div className="flex h-screen bg-ash overflow-hidden">
-      {/* Mobile Sidebar Toggle */}
-      <button 
-        onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-50 p-4 bg-saffron text-white rounded-full shadow-2xl"
-      >
-        <Menu size={24} />
-      </button>
-
-      {/* Sidebar Overlay for Mobile */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-40 lg:hidden"
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar Container */}
-      <motion.aside
-        initial={false}
-        animate={{ x: isOpen ? 0 : -320 }}
-        className={`fixed lg:relative lg:translate-x-0 w-80 h-full bg-white z-50 shadow-2xl lg:shadow-none border-r border-black/5 flex flex-col`}
+    <div className="flex h-screen bg-ash overflow-hidden pt-20">
+      {/* Sidebar Container - Desktop Only */}
+      <aside
+        className={`hidden lg:flex lg:relative w-80 h-full bg-white z-50 border-r border-black/5 flex-col`}
       >
         {/* Sidebar Header */}
         <div className="p-8 border-b border-black/5 flex items-center justify-between">
@@ -109,9 +86,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             <span className="font-serif font-black text-xl text-charcoal tracking-tight">Heritage<span className="text-saffron">CMS</span></span>
           </Link>
-          <button onClick={() => setIsOpen(false)} className="lg:hidden text-charcoal/40 p-1">
-            <X size={20} />
-          </button>
         </div>
 
         {/* Navigation Section */}
@@ -178,7 +152,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span>Sign Out</span>
           </button>
         </div>
-      </motion.aside>
+      </aside>
 
       {/* Main Content Area */}
       <main className="flex-grow h-full overflow-y-auto scroll-smooth bg-ash/50 p-4 md:p-8 lg:p-12 xl:p-16">

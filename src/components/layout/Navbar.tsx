@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard, ChevronDown, Settings, Users, HardDrive } from 'lucide-react';
 import CommandPalette from '@/components/ui/CommandPalette';
+import { UserRole } from '@/types/user';
 
 const Navbar = ({ settings }: { settings: any }) => {
   const { data: session, status } = useSession();
@@ -17,6 +18,7 @@ const Navbar = ({ settings }: { settings: any }) => {
   const profileRef = useRef<HTMLDivElement>(null);
 
   const isHome = pathname === '/';
+  const isDashboard = pathname.startsWith('/dashboard');
   const shouldShowSolid = isScrolled || !isHome;
 
   const clubName = settings?.clubName || 'Heritage & Tourism Club';
@@ -59,6 +61,16 @@ const Navbar = ({ settings }: { settings: any }) => {
     { name: 'Blogs', href: '/blogs', icon: <BookOpen className="w-5 h-5 text-saffron" /> },
   ];
 
+  // Dashboard sub-menu for mobile
+  const dashboardItems = [
+    { href: '/dashboard', label: 'System Overview', icon: <LayoutDashboard size={20} className="text-emerald" /> },
+    { href: '/dashboard/manager/events', label: 'Manage Events', icon: <Calendar size={20} className="text-saffron" /> },
+    { href: '/dashboard/manager/media', label: 'Media Library', icon: <HardDrive size={20} className="text-emerald" /> },
+    { href: '/dashboard/manager/site', label: 'Global Settings', icon: <Settings size={20} className="text-saffron" /> },
+    { href: '/dashboard/manager/blogs', label: 'Manage Blogs', icon: <BookOpen size={20} className="text-emerald" /> },
+    { href: '/dashboard/admin/users', label: 'User Directory', icon: <Users size={20} className="text-saffron" />, adminOnly: true },
+  ];
+
   // Add Dashboard link to main menu if authenticated
   if (status === 'authenticated' && session?.user) {
     const role = session.user.role?.toUpperCase();
@@ -74,9 +86,12 @@ const Navbar = ({ settings }: { settings: any }) => {
   }
 
   return (
-    <nav className={`fixed w-full z-[100] transition-all duration-500 ${
-      shouldShowSolid ? 'glass-nav h-20 shadow-sm' : 'bg-transparent h-24'
-    }`}>
+    <nav 
+      style={{ top: 0, left: 0, right: 0 }}
+      className={`fixed w-full z-[100] transition-all duration-500 ${
+        shouldShowSolid ? 'bg-white shadow-md h-20' : 'bg-transparent h-24'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center space-x-3 group">
@@ -225,6 +240,29 @@ const Navbar = ({ settings }: { settings: any }) => {
                     </div>
                   </Link>
                 ))}
+
+                {/* Dashboard Specific Section in Mobile Menu */}
+                {isDashboard && session?.user && (
+                  <div className="pt-8 border-t border-black/5 space-y-6">
+                    <span className="text-[10px] font-black text-emerald uppercase tracking-[0.3em] block mb-4">Dashboard Navigation</span>
+                    {dashboardItems.map((item) => {
+                      if (item.adminOnly && session.user.role !== UserRole.ADMIN) return null;
+                      return (
+                        <Link 
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center space-x-4 group"
+                        >
+                          <div className="p-2.5 bg-ash rounded-xl group-hover:bg-emerald/10 transition-all">
+                            {item.icon}
+                          </div>
+                          <span className="font-bold text-charcoal tracking-wide">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
                 
                 <div className="pt-8 border-t border-black/5 space-y-4">
                   <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em] block mb-4">Account</span>
@@ -247,7 +285,7 @@ const Navbar = ({ settings }: { settings: any }) => {
                         className="w-full flex items-center justify-center space-x-3 bg-charcoal text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-charcoal/20 active:scale-95 transition-transform"
                       >
                         <LayoutDashboard size={20} />
-                        <span>Dashboard</span>
+                        <span>Dashboard Home</span>
                       </Link>
                       <button 
                         onClick={() => signOut()}
