@@ -22,6 +22,18 @@ const Navbar = ({ settings }: { settings: any }) => {
   const clubName = settings?.clubName || 'Heritage & Tourism Club';
   const logoUrl = settings?.logoUrl || '/logo.jpeg';
 
+  // Scroll Lock for Mobile Menu
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
