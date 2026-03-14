@@ -76,7 +76,6 @@ const CommandPalette = () => {
 
                   <Command.Group heading={<span className="px-4 text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em] mb-2 block">Quick Navigation</span>}>
                     {[
-                      { icon: <Landmark />, label: 'Heritage Map', route: '/heritage-map', color: 'text-saffron' },
                       { icon: <Calendar />, label: 'All Events', route: '/events', color: 'text-emerald' },
                       { icon: <BookOpen />, label: 'Travel Blog', route: '/blogs', color: 'text-saffron' },
                       { icon: <User />, label: 'Member Portal', route: '/portal', color: 'text-emerald' },

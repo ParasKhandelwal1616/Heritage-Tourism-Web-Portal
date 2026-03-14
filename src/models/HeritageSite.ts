@@ -1,14 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { SiteType, SiteScale, SiteStatus, IHeritageSite as IHeritageSiteBase } from '@/types/heritage';
 
-export interface IHeritageSite extends Document {
-  name: string;
-  description: string;
-  position: [number, number]; // [lat, lng]
-  image: string;
-  category: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export interface IHeritageSite extends Document, IHeritageSiteBase {}
 
 const HeritageSiteSchema: Schema = new Schema(
   {
@@ -26,6 +19,22 @@ const HeritageSiteSchema: Schema = new Schema(
     },
     image: { type: String, required: true },
     category: { type: String, default: 'Cultural' },
+    type: { 
+      type: String, 
+      enum: Object.values(SiteType), 
+      default: SiteType.OTHER 
+    },
+    scale: { 
+      type: String, 
+      enum: Object.values(SiteScale), 
+      default: SiteScale.MINOR 
+    },
+    status: { 
+      type: String, 
+      enum: Object.values(SiteStatus), 
+      default: SiteStatus.APPROVED 
+    },
+    suggestedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   {
     timestamps: true,
@@ -33,3 +42,4 @@ const HeritageSiteSchema: Schema = new Schema(
 );
 
 export default mongoose.models.HeritageSite || mongoose.model<IHeritageSite>('HeritageSite', HeritageSiteSchema);
+export { SiteType, SiteScale, SiteStatus };

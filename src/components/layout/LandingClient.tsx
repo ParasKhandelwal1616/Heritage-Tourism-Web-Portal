@@ -4,15 +4,20 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Hero from '@/components/layout/Hero';
 import DestinationCard from '@/components/ui/DestinationCard';
-import TimeTravelScroll from '@/components/ui/TimeTravelScroll';
 import { Compass, Landmark, Users, Heart } from 'lucide-react';
 
 interface LandingClientProps {
   destinations: any[];
   videoUrl: string;
+  stats: {
+    totalEvents: number;
+    totalSites: number;
+    totalUsers: number;
+    joyRate: number;
+  };
 }
 
-const LandingClient = ({ destinations, videoUrl }: LandingClientProps) => {
+const LandingClient = ({ destinations, videoUrl, stats }: LandingClientProps) => {
   return (
     <div className="bg-white min-h-screen">
       <Hero videoUrl={videoUrl} />
@@ -54,22 +59,15 @@ const LandingClient = ({ destinations, videoUrl }: LandingClientProps) => {
         </div>
       </section>
 
-      {/* Time-Travel Experience */}
-      <TimeTravelScroll 
-        siteName="The Taj Mahal"
-        oldImage="https://images.unsplash.com/photo-1548013146-72479768bbaa?auto=format&fit=crop&q=80&w=2073&sepia=100" 
-        modernImage="https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&q=80&w=2073"
-      />
-
       {/* Stats / Why Join Section */}
       <section className="py-24 bg-ash border-y border-black/5">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
             {[
-              { icon: <Compass className="text-saffron" />, value: '25+', label: 'Cultural Events' },
-              { icon: <Landmark className="text-emerald" />, value: '45+', label: 'Heritage Sites' },
-              { icon: <Users className="text-saffron" />, value: '12K', label: 'Active Members' },
-              { icon: <Heart className="text-emerald" />, value: '98%', label: 'Joy Rate' }
+              { icon: <Compass className="text-saffron" />, value: `${stats.totalEvents}+`, label: 'Cultural Events' },
+              { icon: <Landmark className="text-emerald" />, value: `${stats.totalSites}+`, label: 'Heritage Sites' },
+              { icon: <Users className="text-saffron" />, value: stats.totalUsers >= 1000 ? `${(stats.totalUsers/1000).toFixed(1)}K` : stats.totalUsers, label: 'Active Members' },
+              { icon: <Heart className="text-emerald" />, value: `${stats.joyRate}%`, label: 'Joy Rate' }
             ].map((stat, idx) => (
               <div key={idx} className="text-center group">
                 <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-black/5 group-hover:scale-110 transition-transform">

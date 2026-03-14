@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@tanstack/react-table": "^8.21.3",
     "@types/leaflet": "^1.9.21",
     "async_hooks": "^1.0.0",
     "bcryptjs": "^3.0.3",

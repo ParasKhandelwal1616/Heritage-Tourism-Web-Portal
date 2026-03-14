@@ -3,12 +3,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Landmark, Map, Calendar, BookOpen, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard } from 'lucide-react';
 import CommandPalette from '@/components/ui/CommandPalette';
 
-const Navbar = () => {
+const Navbar = ({ settings }: { settings: any }) => {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -18,6 +18,9 @@ const Navbar = () => {
 
   const isHome = pathname === '/';
   const shouldShowSolid = isScrolled || !isHome;
+
+  const clubName = settings?.clubName || 'Heritage & Tourism Club';
+  const logoUrl = settings?.logoUrl || '/logo.jpeg';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -40,10 +43,23 @@ const Navbar = () => {
   }, []);
 
   const menuItems: { name: string; href: string; icon: React.ReactNode }[] = [
-    { name: 'Heritage Map', href: '/heritage-map', icon: <Map className="w-5 h-5 text-saffron" /> },
     { name: 'Events', href: '/events', icon: <Calendar className="w-5 h-5 text-emerald" /> },
     { name: 'Blogs', href: '/blogs', icon: <BookOpen className="w-5 h-5 text-saffron" /> },
   ];
+
+  // Add Dashboard link to main menu if authenticated
+  if (status === 'authenticated' && session?.user) {
+    const role = session.user.role?.toUpperCase();
+    let dashboardLabel = 'Dashboard';
+    if (role === 'ADMIN') dashboardLabel = 'Admin Panel';
+    else if (role === 'MANAGER') dashboardLabel = 'Manager Portal';
+
+    menuItems.push({ 
+      name: dashboardLabel, 
+      href: '/dashboard', 
+      icon: <LayoutDashboard className="w-5 h-5 text-emerald" /> 
+    });
+  }
 
   return (
     <nav className={`fixed w-full z-[100] transition-all duration-500 ${
@@ -54,15 +70,15 @@ const Navbar = () => {
         <Link href="/" className="flex items-center space-x-3 group">
           <div className="relative w-10 h-10 overflow-hidden rounded-xl border-2 border-saffron shadow-lg group-hover:scale-110 transition-transform">
             <img 
-              src="/logo.jpeg" 
-              alt="Heritage & Tourism Club Logo" 
+              src={logoUrl} 
+              alt={`${clubName} Logo`} 
               className="w-full h-full object-cover"
             />
           </div>
           <span className={`font-serif text-2xl font-black tracking-tight transition-colors duration-300 ${
             shouldShowSolid ? 'text-charcoal' : 'text-charcoal md:text-white'
           }`}>
-            Heritage & Tourism <span className="text-saffron">Club</span>
+            {clubName.split(' ').slice(0, -1).join(' ')} <span className="text-saffron">{clubName.split(' ').slice(-1)}</span>
           </span>
         </Link>
 
@@ -114,10 +130,6 @@ const Navbar = () => {
                       <p className="text-[10px] font-black text-emerald uppercase tracking-widest">{session.user?.role}</p>
                     </div>
                     <div className="py-2">
-                      <Link href="/dashboard" className="flex items-center space-x-3 px-4 py-2 text-sm text-charcoal/70 hover:bg-ash rounded-xl transition-colors">
-                        <LayoutDashboard size={16} />
-                        <span>Dashboard</span>
-                      </Link>
                       <button 
                         onClick={() => signOut()}
                         className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors"

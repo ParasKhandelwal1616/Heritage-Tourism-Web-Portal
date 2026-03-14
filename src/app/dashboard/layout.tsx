@@ -16,7 +16,8 @@ import {
   LogOut,
   ChevronRight,
   Map,
-  ShieldAlert
+  ShieldAlert,
+  HardDrive
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -52,11 +53,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // Privileged links grouped under Portal
   const managerMenu = [
     { href: '/dashboard', label: 'System Overview', icon: LayoutDashboard },
-    { href: '/dashboard/manager/heritage', label: 'Manage Map', icon: Map },
     { href: '/dashboard/manager/events', label: 'Manage Events', icon: Calendar },
-    { href: '/dashboard/manager/site', label: 'Site Settings', icon: ShieldAlert },
-    { href: '/dashboard/blogs', label: 'Manage Blogs', icon: BookOpen },
-    { href: '/dashboard/admin/users', label: 'User Directory', icon: Users },
+    { href: '/dashboard/manager/media', label: 'Media Library', icon: HardDrive },
+    { href: '/dashboard/manager/site', label: 'Global Settings', icon: Settings },
+    { href: '/dashboard/manager/blogs', label: 'Manage Blogs', icon: BookOpen },
+    { href: '/dashboard/admin/users', label: 'User Directory', icon: Users, role: [UserRole.ADMIN] },
   ];
 
   const settingsMenu = [
@@ -136,9 +137,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <div className="ml-2 h-1 flex-grow bg-emerald/10 rounded-full" />
                 </p>
                 <div className="flex flex-col space-y-1">
-                  {managerMenu.map((item) => (
-                    <SidebarLink key={item.href} {...item} active={pathname === item.href} />
-                  ))}
+                  {managerMenu.map((item) => {
+                    // Specific check for User Directory (Admin only)
+                    if (item.href.includes('admin') && userRole !== UserRole.ADMIN) return null;
+                    return <SidebarLink key={item.href} {...item} active={pathname === item.href} />;
+                  })}
                 </div>
               </div>
             )}

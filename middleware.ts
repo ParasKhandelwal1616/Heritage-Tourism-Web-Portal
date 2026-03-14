@@ -9,7 +9,7 @@ export default withAuth(
 
     // Admin-only routes
     if (path.startsWith("/dashboard/admin") && token?.role !== UserRole.ADMIN) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/403", req.url));
     }
 
     // Manager and Admin routes
@@ -18,7 +18,7 @@ export default withAuth(
       token?.role !== UserRole.ADMIN &&
       token?.role !== UserRole.MANAGER
     ) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/403", req.url));
     }
 
     return NextResponse.next();
@@ -34,7 +34,6 @@ export const config = {
   matcher: [
     "/dashboard/:path*", 
     "/portal/:path*",
-    "/heritage-map/:path*",
     "/events/:path*",
     "/blogs/:path*"
   ],

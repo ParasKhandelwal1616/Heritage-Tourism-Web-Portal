@@ -1,143 +1,221 @@
 'use client';
 
-import React, { useState } from 'react';
-import { updateHeroVideo } from '@/app/actions/site';
-import { Upload, Video, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { getGlobalSettings, updateGlobalSettings } from '@/app/actions/site';
+import { ShieldAlert, Save, Globe, Mail, Link as LinkIcon, Image as ImageIcon, Video, Phone, MapPin, Instagram, Twitter, Facebook, Github, Linkedin, FileText } from 'lucide-react';
 
-export default function SiteSettingsPage() {
-  const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<'idle' | 'uploading' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
-  const [preview, setPreview] = useState<string | null>(null);
+export default function GlobalSettingsPage() {
+  const [settings, setSettings] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      if (selectedFile.size > 50 * 1024 * 1024) { // 50MB limit
-        setMessage('File size must be less than 50MB');
-        setStatus('error');
-        return;
-      }
-      if (!selectedFile.type.startsWith('video/')) {
-        setMessage('Please select a valid video file');
-        setStatus('error');
-        return;
-      }
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
-      setStatus('idle');
-      setMessage('');
-    }
-  };
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const data = await getGlobalSettings();
+      setSettings(data);
+      setLoading(false);
+    };
+    fetchSettings();
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!file) return;
-
-    setStatus('uploading');
-    const formData = new FormData();
-    formData.append('video', file);
-
+    setSaving(true);
+    const formData = new FormData(e.currentTarget);
     try {
-      const result = await updateHeroVideo(formData);
+      const result = await updateGlobalSettings(formData);
       if (result.success) {
-        setStatus('success');
-        setMessage('Background video updated successfully!');
+        alert('Settings updated successfully');
+        setSettings(result.data);
       } else {
-        setStatus('error');
-        setMessage(result.error || 'Failed to update video');
+        alert('Failed to update: ' + result.error);
       }
-    } catch (err: any) {
-      setStatus('error');
-      setMessage(err.message || 'An unexpected error occurred');
+    } catch (error) {
+      alert('Error updating settings');
+    } finally {
+      setSaving(false);
     }
   };
+
+  if (loading) return <div className="p-8 text-center text-gray-500 font-serif italic">Loading configurations...</div>;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12">
-      <header className="space-y-4">
-        <h1 className="font-serif text-5xl font-black text-charcoal">Site <span className="text-saffron italic">Settings</span></h1>
-        <p className="text-charcoal/60 text-lg max-w-2xl font-medium leading-relaxed">
-          Manage your club's landing page appearance. Upload high-quality videos 
-          to keep the background fresh and engaging for your visitors.
-        </p>
-      </header>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-4xl font-serif font-black text-white tracking-tight flex items-center">
+            <ShieldAlert className="mr-4 text-emerald" size={40} />
+            Global <span className="text-emerald">Settings</span>
+          </h1>
+          <p className="text-gray-500 mt-2 font-medium">Configure club identity, contact details, and system-wide parameters.</p>
+        </div>
+      </div>
 
-      <section className="bg-white rounded-[3rem] shadow-2xl shadow-charcoal/5 border border-black/5 p-12 overflow-hidden">
-        <h2 className="text-2xl font-bold text-charcoal mb-8 flex items-center space-x-3">
-          <Video className="text-saffron" />
-          <span>Hero Background Video</span>
-        </h2>
+      <form onSubmit={handleSubmit} className="bg-gray-950/50 border border-gray-800 p-8 rounded-3xl shadow-2xl space-y-8 backdrop-blur-xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Club Info */}
+          <div className="space-y-6">
+            <h3 className="text-xs font-black text-emerald uppercase tracking-[0.2em] mb-4 flex items-center">
+              <span>Club Identity</span>
+              <div className="ml-2 h-0.5 flex-grow bg-emerald/10 rounded-full" />
+            </h3>
+            
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <Globe className="w-3 h-3 mr-2" /> Club Name
+              </label>
+              <input 
+                name="clubName" 
+                defaultValue={settings?.clubName}
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+              />
+            </div>
 
-        <form onSubmit={handleSubmit} className="space-y-10">
-          <div className="relative group">
-            <input
-              type="file"
-              accept="video/*"
-              onChange={handleFileChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              id="video-upload"
-            />
-            <div className={`
-              border-4 border-dashed rounded-[2rem] p-16 text-center transition-all duration-500
-              ${file ? 'border-emerald/40 bg-emerald/5' : 'border-black/5 bg-ash group-hover:border-saffron/40 group-hover:bg-saffron/5'}
-            `}>
-              <div className="space-y-6">
-                <div className={`w-20 h-20 rounded-full mx-auto flex items-center justify-center transition-colors ${file ? 'bg-emerald text-white' : 'bg-white text-charcoal/40 shadow-sm'}`}>
-                  {status === 'uploading' ? <Loader2 className="animate-spin" size={32} /> : <Upload size={32} />}
-                </div>
-                <div className="space-y-2">
-                  <p className="text-xl font-bold text-charcoal">
-                    {file ? file.name : 'Click to upload or drag & drop'}
-                  </p>
-                  <p className="text-sm text-charcoal/40 font-medium">MP4, WebM or Ogg (Max 50MB)</p>
-                </div>
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <FileText className="w-3 h-3 mr-2" /> Club Description
+              </label>
+              <textarea 
+                name="clubDescription" 
+                defaultValue={settings?.clubDescription}
+                rows={4}
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+              />
+            </div>
+          </div>
+
+          {/* Contact Details */}
+          <div className="space-y-6">
+            <h3 className="text-xs font-black text-emerald uppercase tracking-[0.2em] mb-4 flex items-center">
+              <span>Contact Information</span>
+              <div className="ml-2 h-0.5 flex-grow bg-emerald/10 rounded-full" />
+            </h3>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <Mail className="w-3 h-3 mr-2" /> Contact Email
+              </label>
+              <input 
+                name="contactEmail" 
+                type="email"
+                defaultValue={settings?.contactEmail}
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <Phone className="w-3 h-3 mr-2" /> Contact Phone
+              </label>
+              <input 
+                name="contactPhone" 
+                defaultValue={settings?.contactPhone}
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                <MapPin className="w-3 h-3 mr-2" /> Contact Address
+              </label>
+              <input 
+                name="contactAddress" 
+                defaultValue={settings?.contactAddress}
+                className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+              />
+            </div>
+          </div>
+
+          {/* Social Links */}
+          <div className="space-y-6 md:col-span-2">
+            <h3 className="text-xs font-black text-emerald uppercase tracking-[0.2em] mb-4 flex items-center">
+              <span>Social Connectivity</span>
+              <div className="ml-2 h-0.5 flex-grow bg-emerald/10 rounded-full" />
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <Instagram className="w-3 h-3 mr-2" /> Instagram
+                </label>
+                <input name="instagramUrl" defaultValue={settings?.instagramUrl} className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <Twitter className="w-3 h-3 mr-2" /> Twitter
+                </label>
+                <input name="twitterUrl" defaultValue={settings?.twitterUrl} className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <Facebook className="w-3 h-3 mr-2" /> Facebook
+                </label>
+                <input name="facebookUrl" defaultValue={settings?.facebookUrl} className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <Github className="w-3 h-3 mr-2" /> GitHub
+                </label>
+                <input name="githubUrl" defaultValue={settings?.githubUrl} className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <Linkedin className="w-3 h-3 mr-2" /> LinkedIn
+                </label>
+                <input name="linkedinUrl" defaultValue={settings?.linkedinUrl} className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden" />
               </div>
             </div>
           </div>
 
-          {preview && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="relative aspect-video rounded-[2rem] overflow-hidden shadow-2xl border-8 border-white"
-            >
-              <video src={preview} controls className="w-full h-full object-cover" />
-              <div className="absolute top-4 left-4 px-4 py-2 bg-black/50 backdrop-blur-md text-white text-xs font-bold rounded-full uppercase tracking-widest">
-                Preview
+          {/* Media Assets */}
+          <div className="space-y-6 md:col-span-2">
+            <h3 className="text-xs font-black text-emerald uppercase tracking-[0.2em] mb-4 flex items-center">
+              <span>Core Media Assets</span>
+              <div className="ml-2 h-0.5 flex-grow bg-emerald/10 rounded-full" />
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <ImageIcon className="w-3 h-3 mr-2" /> Logo Image URL
+                </label>
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 rounded-xl border border-gray-800 overflow-hidden shrink-0 bg-white">
+                    <img src={settings?.logoUrl} alt="Logo Preview" className="w-full h-full object-cover" />
+                  </div>
+                  <input 
+                    name="logoUrl" 
+                    defaultValue={settings?.logoUrl}
+                    className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+                  />
+                </div>
               </div>
-            </motion.div>
-          )}
 
-          {status === 'success' && (
-            <div className="p-4 bg-emerald/10 border border-emerald/20 text-emerald rounded-2xl flex items-center space-x-3">
-              <CheckCircle2 size={20} />
-              <span className="font-bold">{message}</span>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center">
+                  <Video className="w-3 h-3 mr-2" /> Hero Video URL
+                </label>
+                <input 
+                  name="heroVideoUrl" 
+                  defaultValue={settings?.heroVideoUrl}
+                  className="w-full px-4 py-3 bg-gray-900 border border-gray-800 rounded-xl text-white font-bold focus:ring-2 focus:ring-emerald outline-hidden"
+                />
+              </div>
             </div>
-          )}
+          </div>
+        </div>
 
-          {status === 'error' && (
-            <div className="p-4 bg-red-50 border border-red-100 text-red-500 rounded-2xl flex items-center space-x-3">
-              <AlertCircle size={20} />
-              <span className="font-bold">{message}</span>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={!file || status === 'uploading'}
-            className={`
-              w-full py-6 rounded-2xl font-black text-lg uppercase tracking-[0.2em] transition-all
-              ${!file || status === 'uploading' 
-                ? 'bg-ash text-charcoal/20 cursor-not-allowed' 
-                : 'bg-saffron text-white shadow-xl shadow-saffron/20 hover:scale-[1.02] active:scale-95'}
-            `}
+        <div className="pt-8 border-t border-gray-800 flex justify-end">
+          <button 
+            type="submit" 
+            disabled={saving}
+            className="flex items-center space-x-3 px-12 py-4 bg-emerald text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl hover:bg-emerald/90 transition-all disabled:opacity-50"
           >
-            {status === 'uploading' ? 'Updating Site...' : 'Update Background Video'}
+            <Save size={20} />
+            <span>{saving ? 'Synchronizing...' : 'Save Global State'}</span>
           </button>
-        </form>
-      </section>
+        </div>
+      </form>
     </div>
   );
 }

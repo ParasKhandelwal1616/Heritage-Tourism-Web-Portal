@@ -12,13 +12,19 @@ export interface QuizQuestion {
 export interface HeritageAIResponse {
   history: string;
   quizzes: QuizQuestion[];
+  error?: string;
+  isQuotaExceeded?: boolean;
 }
 
 export async function getHeritageInfo(locationName: string): Promise<HeritageAIResponse | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.error("GEMINI_API_KEY is not set");
-    return null;
+    return { 
+      history: "API key is missing. Please check your environment variables.", 
+      quizzes: [],
+      error: "Configuration Error"
+    };
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -48,8 +54,23 @@ export async function getHeritageInfo(locationName: string): Promise<HeritageAIR
     // Clean JSON from potential markdown markers (e.g., ```json ... ```)
     const jsonString = responseText.replace(/```json|```/g, "").trim();
     return JSON.parse(jsonString);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini AI error:", error);
-    return null;
+    
+    // Check for quota exceeded error (429)
+    if (error?.status === 429 || error?.message?.includes('429') || error?.message?.includes('quota')) {
+      return {
+        history: "The AI guide is currently resting due to high demand (Free Tier Quota Exceeded). Please try again in a minute!",
+        quizzes: [],
+        isQuotaExceeded: true,
+        error: "Quota Exceeded"
+      };
+    }
+
+    return {
+      history: "Our AI guide encountered an error while researching this site. Please try again later.",
+      quizzes: [],
+      error: "Service Error"
+    };
   }
 }

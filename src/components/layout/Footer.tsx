@@ -1,9 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
-import { Landmark, Instagram, Twitter, Facebook, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Twitter, Facebook, Mail, Phone, MapPin, Github, Linkedin } from 'lucide-react';
 
-const Footer = () => {
+const Footer = ({ settings }: { settings: any }) => {
   const currentYear = new Date().getFullYear();
+  const clubName = settings?.clubName || 'Heritage & Tourism Club';
+  const logoUrl = settings?.logoUrl || '/logo.jpeg';
+  const email = settings?.contactEmail || 'hello@heritagetours.club';
+  const phone = settings?.contactPhone || '+1 (555) 000-HERITAGE';
+  const address = settings?.contactAddress || '123 History Lane, Cultural Hub, NY 10001';
+  const description = settings?.clubDescription || 'Preserving history, exploring culture, and connecting travelers with the stories that shaped our world. Join us in our mission.';
 
   return (
     <footer className="bg-primary text-heritage-bg pt-16 pb-8">
@@ -12,25 +18,26 @@ const Footer = () => {
         {/* Brand Section */}
         <div className="space-y-6">
           <Link href="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 overflow-hidden rounded-xl border border-secondary/20 shadow-lg">
+            <div className="w-10 h-10 overflow-hidden rounded-xl border border-secondary/20 shadow-lg bg-white">
               <img 
-                src="/logo.jpeg" 
-                alt="Heritage & Tourism Club Logo" 
+                src={logoUrl} 
+                alt={`${clubName} Logo`} 
                 className="w-full h-full object-cover"
               />
             </div>
             <span className="font-serif text-2xl font-bold tracking-tight">
-              Heritage <span className="text-secondary">& Tourism</span> Club
+              {clubName.split(' ').slice(0, -1).join(' ')} <span className="text-secondary">{clubName.split(' ').slice(-1)}</span>
             </span>
           </Link>
           <p className="text-heritage-bg/70 leading-relaxed text-sm">
-            Preserving history, exploring culture, and connecting travelers with 
-            the stories that shaped our world. Join us in our mission.
+            {description}
           </p>
           <div className="flex space-x-4">
-            <Link href="#" className="hover:text-secondary transition-colors"><Instagram size={20} /></Link>
-            <Link href="#" className="hover:text-secondary transition-colors"><Twitter size={20} /></Link>
-            <Link href="#" className="hover:text-secondary transition-colors"><Facebook size={20} /></Link>
+            {settings?.instagramUrl && <Link href={settings.instagramUrl} className="hover:text-secondary transition-colors"><Instagram size={20} /></Link>}
+            {settings?.twitterUrl && <Link href={settings.twitterUrl} className="hover:text-secondary transition-colors"><Twitter size={20} /></Link>}
+            {settings?.facebookUrl && <Link href={settings.facebookUrl} className="hover:text-secondary transition-colors"><Facebook size={20} /></Link>}
+            {settings?.githubUrl && <Link href={settings.githubUrl} className="hover:text-secondary transition-colors"><Github size={20} /></Link>}
+            {settings?.linkedinUrl && <Link href={settings.linkedinUrl} className="hover:text-secondary transition-colors"><Linkedin size={20} /></Link>}
           </div>
         </div>
 
@@ -38,7 +45,6 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-bold mb-6 text-secondary">Explore</h3>
           <ul className="space-y-3">
-            <li><Link href="/heritage-map" className="text-heritage-bg/80 hover:text-white transition-colors">Heritage Sites</Link></li>
             <li><Link href="/blogs" className="text-heritage-bg/80 hover:text-white transition-colors">Travel Blog</Link></li>
             <li><Link href="/events" className="text-heritage-bg/80 hover:text-white transition-colors">Club Events</Link></li>
           </ul>
@@ -61,15 +67,15 @@ const Footer = () => {
           <ul className="space-y-4">
             <li className="flex items-center space-x-3 text-heritage-bg/80">
               <Mail size={18} className="text-secondary shrink-0" />
-              <span className="text-sm">hello@heritagetours.club</span>
+              <span className="text-sm">{email}</span>
             </li>
             <li className="flex items-center space-x-3 text-heritage-bg/80">
               <Phone size={18} className="text-secondary shrink-0" />
-              <span className="text-sm">+1 (555) 000-HERITAGE</span>
+              <span className="text-sm">{phone}</span>
             </li>
             <li className="flex items-center space-x-3 text-heritage-bg/80">
               <MapPin size={18} className="text-secondary shrink-0" />
-              <span className="text-sm">123 History Lane, Cultural Hub, NY 10001</span>
+              <span className="text-sm">{address}</span>
             </li>
           </ul>
         </div>
@@ -77,7 +83,7 @@ const Footer = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-heritage-bg/40 text-xs">
-        <p>&copy; {currentYear} Heritage & Tourism Club. All rights reserved.</p>
+        <p>&copy; {currentYear} {clubName}. All rights reserved.</p>
         <p className="mt-2 italic font-serif">"Honoring the past, inspiring the future."</p>
       </div>
     </footer>
