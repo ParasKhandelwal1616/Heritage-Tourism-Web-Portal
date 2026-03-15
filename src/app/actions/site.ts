@@ -16,13 +16,6 @@ import { writeFile, mkdir, readdir, stat } from 'fs/promises';
 import path from 'path';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
 // Global Settings Actions
 export async function getGlobalSettings() {
   await dbConnect();
@@ -125,6 +118,13 @@ export async function deleteMediaFile(url: string) {
 
   try {
     if (url.startsWith('http')) {
+      // Configure Cloudinary inside the function
+      cloudinary.config({
+        cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      });
+
       // It's a Cloudinary URL
       // Extract public_id from URL: e.g., https://res.cloudinary.com/cloud_name/video/upload/v12345/public_id.mp4
       const parts = url.split('/');
