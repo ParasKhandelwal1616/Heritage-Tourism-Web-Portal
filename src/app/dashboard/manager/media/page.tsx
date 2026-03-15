@@ -1,16 +1,15 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import { getMediaFiles, deleteMediaFile, uploadMediaFile } from '@/app/actions/site';
+import React, { useEffect, useState } from 'react';
+import { getMediaFiles, deleteMediaFile } from '@/app/actions/site';
 import { PowerTable } from '@/components/ui/PowerTable';
 import { ColumnDef } from '@tanstack/react-table';
-import { ImageIcon, FileIcon, VideoIcon, ExternalLink, HardDrive, Clock, Trash2, Upload, Loader2 } from 'lucide-react';
+import { ImageIcon, FileIcon, VideoIcon, ExternalLink, HardDrive, Clock, Trash2, Upload, Loader2, Link as LinkIcon } from 'lucide-react';
+import { CldUploadWidget } from 'next-cloudinary';
 
 export default function MediaLibraryPage() {
   const [files, setFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchFiles = async () => {
     try {
@@ -27,37 +26,31 @@ export default function MediaLibraryPage() {
     fetchFiles();
   }, []);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-      const res = await uploadMediaFile(formData);
-      if (res.success) {
-        fetchFiles();
-        if (fileInputRef.current) fileInputRef.current.value = '';
-      } else {
-        alert('Upload failed: ' + (res.error || 'Unknown error'));
-      }
-    } catch (error) {
-      alert('Error during upload');
-    } finally {
-      setUploading(false);
+  const handleUploadSuccess = (result: any) => {
+    if (result.event === 'success') {
+      const newFile = {
+        name: result.info.original_filename || 'Cloudinary Upload',
+        url: result.info.secure_url,
+        size: result.info.bytes,
+        createdAt: new Date().toISOString(),
+      };
+      // Manually add to list since backend only reads local files for now
+      setFiles(prev => [newFile, ...prev]);
+      alert('Upload Successful!');
     }
   };
 
-  const handleDelete = async (filename: string) => {
-    if (!confirm(`Permanently destroy ${filename} from the filesystem?`)) return;
+  const handleDelete = async (url: string) => {
+    if (!confirm(`Permanently remove this file reference?`)) return;
     try {
-      const res = await deleteMediaFile(filename);
-      if (res.success) fetchFiles();
-      else alert('Deletion failed: ' + (res.error || 'Unknown error'));
+      const res = await deleteMediaFile(url);
+      if (res.success) {
+        setFiles(prev => prev.filter(f => f.url !== url));
+      } else {
+        alert('Deletion failed: ' + (res.error || 'Unknown error'));
+      }
     } catch (error) {
-      alert('Error during filesystem operation');
+      alert('Error during operation');
     }
   };
 
@@ -75,18 +68,18 @@ export default function MediaLibraryPage() {
       header: 'File Name',
       cell: ({ row }) => (
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gray-900 border border-gray-800 rounded-lg flex items-center justify-center shrink-0">
-            {row.original.name.match(/\.(mp4|webm|ogg)$/i) ? (
+          <div className="w-10 h-10 bg-gray-900 border border-gray-800 rounded-lg flex items-center justify-center shrink-0 overflow-hidden">
+             {row.original.url.match(/\.(mp4|webm|ogg)/i) || row.original.url.includes('/video/upload/') ? (
               <VideoIcon className="w-5 h-5 text-emerald" />
-            ) : row.original.name.match(/\.(jpg|jpeg|png|gif|svg|webp)$/i) ? (
-              <ImageIcon className="w-5 h-5 text-blue-500" />
+            ) : row.original.url.match(/\.(jpg|jpeg|png|gif|svg|webp)/i) || row.original.url.includes('/image/upload/') ? (
+              <img src={row.original.url} className="w-full h-full object-cover" alt="" />
             ) : (
               <FileIcon className="w-5 h-5 text-gray-400" />
             )}
           </div>
           <div className="overflow-hidden">
-            <div className="font-bold text-white truncate">{row.original.name}</div>
-            <div className="text-[10px] text-gray-500 font-mono">{row.original.url}</div>
+            <div className="font-bold text-white truncate max-w-[200px]">{row.original.name}</div>
+            <div className="text-[10px] text-gray-500 font-mono truncate max-w-[200px]">{row.original.url}</div>
           </div>
         </div>
       ),
@@ -125,7 +118,7 @@ export default function MediaLibraryPage() {
             <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-white" />
           </a>
           <button 
-            onClick={() => handleDelete(row.original.name)}
+            onClick={() => handleDelete(row.original.url)}
             className="p-2 bg-gray-900 border border-gray-800 rounded-lg hover:bg-red-500 transition-all group"
           >
             <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-white" />
@@ -135,7 +128,7 @@ export default function MediaLibraryPage() {
     },
   ];
 
-  if (loading) return <div className="p-12 text-center text-gray-500">Scanning filesystem...</div>;
+  if (loading) return <div className="p-12 text-center text-gray-500">Scanning assets...</div>;
 
   return (
     <div className="space-y-12">
@@ -145,34 +138,41 @@ export default function MediaLibraryPage() {
             <HardDrive className="mr-4 text-emerald" size={40} />
             Media <span className="text-emerald">Library</span>
           </h1>
-          <p className="text-gray-500 mt-2 font-medium">Manage uploaded posters, videos, and static assets.</p>
+          <p className="text-gray-500 mt-2 font-medium">Manage cloud-hosted posters, videos, and static assets.</p>
         </div>
         
-        <div>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleUpload} 
-            className="hidden" 
-            accept="video/*,image/*"
-          />
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="flex items-center justify-center space-x-2 bg-emerald text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald/90 transition-all shadow-xl shadow-emerald/20 disabled:opacity-50"
+        <div className="flex items-center space-x-4">
+          <CldUploadWidget 
+            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ml_default"}
+            onSuccess={handleUploadSuccess}
+            options={{
+              maxFileSize: 100000000, // 100MB
+              resourceType: 'auto',
+              clientAllowedFormats: ['png', 'jpeg', 'jpg', 'gif', 'mp4', 'webm', 'ogg'],
+            }}
           >
-            {uploading ? (
-              <Loader2 className="w-5 h-5 animate-spin" />
-            ) : (
-              <Upload className="w-5 h-5" />
+            {({ open }) => (
+              <button 
+                onClick={() => open()}
+                className="flex items-center justify-center space-x-2 bg-emerald text-white px-8 py-4 rounded-2xl font-bold hover:bg-emerald/90 transition-all shadow-xl shadow-emerald/20"
+              >
+                <Upload className="w-5 h-5" />
+                <span>Upload via Cloudinary</span>
+              </button>
             )}
-            <span>{uploading ? 'Uploading...' : 'Upload Media'}</span>
-          </button>
+          </CldUploadWidget>
         </div>
       </div>
 
       <div className="bg-gray-950/50 border border-gray-800 p-8 rounded-3xl shadow-2xl backdrop-blur-3xl">
         <PowerTable columns={columns} data={files} searchKey="name" />
+      </div>
+
+      <div className="p-6 bg-blue-500/10 border border-blue-500/20 rounded-2xl">
+         <p className="text-blue-400 text-sm font-medium flex items-center">
+            <LinkIcon className="w-4 h-4 mr-2" />
+            Note: Ensure `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` are set in your environment.
+         </p>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { 
@@ -8,16 +8,15 @@ import {
   BookOpen, 
   Users, 
   TrendingUp, 
-  ArrowUpRight, 
   ShieldCheck, 
   Map, 
   Globe,
   Star,
-  Zap,
-  Loader2
+  Zap
 } from 'lucide-react';
 import Link from 'next/link';
 import { updateHeroVideo } from '@/app/actions/site';
+import { CldUploadWidget } from 'next-cloudinary';
 
 const OverviewCard = ({ title, value, icon: Icon, change, color }: { title: string; value: string | number; icon: any; change: string, color: string }) => (
   <motion.div 
@@ -43,39 +42,19 @@ const OverviewCard = ({ title, value, icon: Icon, change, color }: { title: stri
 export default function DashboardClient({ stats }: { stats: any }) {
   const { data: session } = useSession();
   const role = (session?.user?.role || 'STUDENT').toUpperCase();
-  const [isUpdatingVideo, setIsUpdatingVideo] = useState(false);
-  const videoInputRef = useRef<HTMLInputElement>(null);
 
-  const handleVideoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Increased limit to 100MB
-    const MAX_FILE_SIZE = 100 * 1024 * 1024; 
-    if (file.size > MAX_FILE_SIZE) {
-      alert(`File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Limit is 100MB. Note: Vercel standard plan may still block uploads over 4.5MB.`);
-      if (videoInputRef.current) videoInputRef.current.value = '';
-      return;
-    }
-
-    if (!confirm('This will update the main hero video on the home screen. Continue?')) return;
-
-    setIsUpdatingVideo(true);
-    const formData = new FormData();
-    formData.append('video', file);
-
-    try {
-      const res = await updateHeroVideo(formData);
-      if (res.success) {
-        alert('Hero video updated successfully!');
-      } else {
-        alert('Failed to update video: ' + res.error);
+  const handleVideoUploadSuccess = async (result: any) => {
+    if (result.event === 'success') {
+      try {
+        const res = await updateHeroVideo(result.info.secure_url);
+        if (res.success) {
+          alert('Hero video updated successfully!');
+        } else {
+          alert('Failed to save video URL: ' + res.error);
+        }
+      } catch (err) {
+        alert('An error occurred while saving the video URL.');
       }
-    } catch (err) {
-      alert('An error occurred while uploading the video.');
-    } finally {
-      setIsUpdatingVideo(false);
-      if (videoInputRef.current) videoInputRef.current.value = '';
     }
   };
 
@@ -131,25 +110,30 @@ export default function DashboardClient({ stats }: { stats: any }) {
                 <span>Manage Blogs</span>
                 <BookOpen size={18} />
               </Link>
-              <input 
-                type="file" 
-                ref={videoInputRef} 
-                onChange={handleVideoChange} 
-                className="hidden" 
-                accept="video/*"
-              />
-              <button 
-                onClick={() => videoInputRef.current?.click()}
-                disabled={isUpdatingVideo}
-                className="flex items-center space-x-2 md:space-x-3 bg-saffron text-white px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-base hover:bg-charcoal transition-all shadow-xl shadow-saffron/20 active:scale-95 group disabled:opacity-50"
+              
+              <CldUploadWidget 
+                uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "ml_default"}
+                onSuccess={handleVideoUploadSuccess}
+                options={{
+                  maxFileSize: 100000000, // 100MB
+                  resourceType: 'video',
+                  clientAllowedFormats: ['mp4', 'webm', 'ogg'],
+                }}
               >
-                {isUpdatingVideo ? (
-                  <Loader2 size={18} className="animate-spin" />
-                ) : (
-                  <Zap size={18} />
+                {({ open }) => (
+                  <button 
+                    onClick={() => {
+                      if (confirm('This will update the main hero video on the home screen. Continue?')) {
+                        open();
+                      }
+                    }}
+                    className="flex items-center space-x-2 md:space-x-3 bg-saffron text-white px-4 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl font-bold text-xs md:text-base hover:bg-charcoal transition-all shadow-xl shadow-saffron/20 active:scale-95 group"
+                  >
+                    <Zap size={18} />
+                    <span>Update Hero Video</span>
+                  </button>
                 )}
-                <span>{isUpdatingVideo ? 'Uploading...' : 'Hero Video'}</span>
-              </button>
+              </CldUploadWidget>
             </>
           )}
         </div>
