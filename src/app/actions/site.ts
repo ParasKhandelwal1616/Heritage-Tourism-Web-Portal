@@ -14,11 +14,12 @@ import { UserRole } from '@/types/user';
 import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir, readdir, stat } from 'fs/promises';
 import path from 'path';
-import { v2 as cloudinary } from 'cloudinary';
 
 // Global Settings Actions
 export async function getGlobalSettings() {
-  await dbConnect();
+  const conn = await dbConnect();
+  if (!conn) return null;
+  
   try {
     let settings = await GlobalSettings.findOne({});
     if (!settings) {
@@ -118,7 +119,9 @@ export async function deleteMediaFile(url: string) {
 
   try {
     if (url.startsWith('http')) {
-      // Configure Cloudinary inside the function
+      // Dynamic import to prevent build-time crashes
+      const cloudinary = (await import('cloudinary')).v2;
+      
       cloudinary.config({
         cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,
@@ -126,10 +129,10 @@ export async function deleteMediaFile(url: string) {
       });
 
       // It's a Cloudinary URL
-      // Extract public_id from URL: e.g., https://res.cloudinary.com/cloud_name/video/upload/v12345/public_id.mp4
+      // Extract public_id from URL
       const parts = url.split('/');
-      const filename = parts[parts.length - 1]; // e.g., public_id.mp4
-      const publicId = filename.split('.')[0]; // e.g., public_id
+      const filename = parts[parts.length - 1]; 
+      const publicId = filename.split('.')[0]; 
       
       const resourceType = url.includes('/video/') ? 'video' : 'image';
       
