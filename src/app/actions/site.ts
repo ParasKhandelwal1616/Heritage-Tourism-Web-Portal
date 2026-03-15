@@ -14,6 +14,14 @@ import { UserRole } from '@/types/user';
 import { revalidatePath } from 'next/cache';
 import { writeFile, mkdir, readdir, stat } from 'fs/promises';
 import path from 'path';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Global Settings Actions
 export async function getGlobalSettings() {
@@ -81,9 +89,6 @@ export async function updateGlobalSettings(formData: FormData) {
 }
 
 // Media Library Actions
-// Note: With Cloudinary, we'll store media references in the database 
-// because Cloudinary listing on the client is restricted for security.
-// For now, let's just use local files and manually added Cloudinary URLs.
 export async function getMediaFiles() {
   const uploadDir = path.join(process.cwd(), 'public/uploads');
   try {
@@ -120,10 +125,19 @@ export async function deleteMediaFile(url: string) {
 
   try {
     if (url.startsWith('http')) {
-      // It's a Cloudinary or External URL
-      // In a real app, you might want to call Cloudinary API to delete it
-      // But for simple implementation, we just stop tracking it.
-      console.log('External file deletion requested (not implemented for safety):', url);
+      // It's a Cloudinary URL
+      // Extract public_id from URL: e.g., https://res.cloudinary.com/cloud_name/video/upload/v12345/public_id.mp4
+      const parts = url.split('/');
+      const filename = parts[parts.length - 1]; // e.g., public_id.mp4
+      const publicId = filename.split('.')[0]; // e.g., public_id
+      
+      const resourceType = url.includes('/video/') ? 'video' : 'image';
+      
+      const result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+      
+      if (result.result !== 'ok' && result.result !== 'not found') {
+        throw new Error(`Cloudinary error: ${result.result}`);
+      }
     } else {
       // It's a local file
       const filename = url.split('/').pop();
@@ -136,6 +150,7 @@ export async function deleteMediaFile(url: string) {
     revalidatePath('/dashboard/manager/media');
     return { success: true };
   } catch (error: any) {
+    console.error('Delete error:', error);
     return { success: false, error: error.message };
   }
 }
