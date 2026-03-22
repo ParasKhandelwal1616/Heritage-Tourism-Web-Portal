@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { 
@@ -9,10 +9,10 @@ import {
   Users, 
   TrendingUp, 
   ShieldCheck, 
-  Map, 
-  Globe,
-  Star,
-  Zap
+  Zap,
+  Settings,
+  MessageSquare,
+  ShieldAlert
 } from 'lucide-react';
 import Link from 'next/link';
 import { updateHeroVideo } from '@/app/actions/site';
@@ -58,6 +58,38 @@ export default function DashboardClient({ stats }: { stats: any }) {
     }
   };
 
+  if (role === 'STUDENT') {
+    return (
+      <div className="space-y-10 md:space-y-16">
+        <div>
+          <span className="text-saffron font-black uppercase tracking-[0.4em] text-[10px] mb-2 block">
+            Student Portal
+          </span>
+          <h2 className="font-serif text-4xl md:text-6xl font-black text-charcoal leading-tight">
+            Welcome, <span className="text-emerald italic">{session?.user?.name?.split(' ')[0]}</span>
+          </h2>
+        </div>
+
+        <section className="bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 border border-black/5 shadow-2xl shadow-charcoal/5 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-saffron/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <h3 className="font-serif text-2xl md:text-3xl font-black text-charcoal mb-8 relative z-10">Quick <span className="text-saffron">Access</span></h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
+            <Link href="/dashboard/chat" className="p-8 bg-charcoal text-white rounded-2xl group hover:bg-emerald transition-all shadow-xl shadow-charcoal/10">
+              <MessageSquare className="text-saffron mb-4" size={32} />
+              <p className="text-xl font-bold">Student Chat</p>
+              <p className="text-sm text-white/60 font-medium">Join the club discussion and polls</p>
+            </Link>
+            <Link href="/dashboard/settings" className="p-8 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl transition-all">
+              <Settings className="text-charcoal mb-4" size={32} />
+              <p className="text-xl font-bold text-charcoal">Profile Settings</p>
+              <p className="text-sm text-charcoal/40 font-medium">Manage your personal information</p>
+            </Link>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   const renderAdminStats = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
       <OverviewCard title="Total Users" value={stats.totalUsers} icon={Users} change="+18%" color="bg-blue-50 text-blue-600" />
@@ -71,14 +103,6 @@ export default function DashboardClient({ stats }: { stats: any }) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
       <OverviewCard title="Total Events" value={stats.totalEvents} icon={Calendar} change="+2" color="bg-emerald-50 text-emerald-600" />
       <OverviewCard title="Active Blogs" value={stats.activeBlogs} icon={BookOpen} change="+4" color="bg-saffron/10 text-saffron" />
-    </div>
-  );
-
-  const renderStudentStats = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-      <OverviewCard title="Points Earned" value="1,250" icon={Star} change="+150" color="bg-yellow-50 text-yellow-600" />
-      <OverviewCard title="Visits Recorded" value="8" icon={Map} change="+2" color="bg-blue-50 text-blue-600" />
-      <OverviewCard title="Quizzes Taken" value="24" icon={Globe} change="+3" color="bg-emerald-50 text-emerald-600" />
     </div>
   );
 
@@ -142,26 +166,31 @@ export default function DashboardClient({ stats }: { stats: any }) {
       <section>
         {role === 'ADMIN' && renderAdminStats()}
         {role === 'MANAGER' && renderManagerStats()}
-        {(role === 'MEMBER' || role === 'STUDENT') && renderStudentStats()}
       </section>
 
-      {/* Role-Specific Actions Section */}
+      {/* Management Hub */}
       <section className="bg-white rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 border border-black/5 shadow-2xl shadow-charcoal/5 overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-saffron/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="flex items-center justify-between mb-8 md:mb-12 relative z-10">
-          <h3 className="font-serif text-2xl md:text-3xl font-black text-charcoal">Quick <span className="text-saffron">Actions</span></h3>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 relative z-10">
-           <Link href="/events" className="p-6 md:p-8 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl hover:shadow-charcoal/5 transition-all">
-              <Calendar className="text-emerald mb-4" size={24} />
-              <p className="font-bold text-charcoal">View Upcoming Events</p>
-              <p className="text-[10px] md:text-xs text-charcoal/40 font-medium">Join club expeditions</p>
+        <h3 className="font-serif text-2xl md:text-3xl font-black text-charcoal mb-8">Management <span className="text-saffron">Hub</span></h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+           <Link href="/dashboard/chat" className="p-6 bg-charcoal text-white rounded-2xl group hover:bg-emerald transition-all shadow-xl shadow-charcoal/10">
+              <ShieldAlert className="text-saffron mb-4" size={24} />
+              <p className="font-bold">Student Chat</p>
+              <p className="text-[10px] text-white/60 font-medium">Moderate community chat</p>
            </Link>
-           <Link href="/blogs" className="p-6 md:p-8 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl hover:shadow-charcoal/5 transition-all">
-              <BookOpen className="text-blue-500 mb-4" size={24} />
-              <p className="font-bold text-charcoal">Read Member Blogs</p>
-              <p className="text-[10px] md:text-xs text-charcoal/40 font-medium">Learn from the community</p>
+           <Link href="/dashboard/staff-chat" className="p-6 bg-emerald text-white rounded-2xl group hover:bg-charcoal transition-all shadow-xl shadow-emerald/10">
+              <MessageSquare className="text-white mb-4" size={24} />
+              <p className="font-bold">Club Chat</p>
+              <p className="text-[10px] text-white/60 font-medium">Internal staff discussion</p>
+           </Link>
+           <Link href="/events" className="p-6 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl transition-all">
+              <Calendar className="text-blue-500 mb-4" size={24} />
+              <p className="font-bold text-charcoal">View Events</p>
+              <p className="text-[10px] text-charcoal/40 font-medium">Join club expeditions</p>
+           </Link>
+           <Link href="/blogs" className="p-6 bg-ash/30 rounded-2xl border border-black/5 group hover:bg-white hover:shadow-xl transition-all">
+              <BookOpen className="text-emerald mb-4" size={24} />
+              <p className="font-bold text-charcoal">Read Blogs</p>
+              <p className="text-[10px] text-charcoal/40 font-medium">Member community</p>
            </Link>
         </div>
       </section>

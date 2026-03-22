@@ -115,14 +115,7 @@ const Navbar = ({ settings }: { settings: any }) => {
 
   // Add Auth-only links
   if (status === 'authenticated' && session?.user) {
-    // Add Chat
-    menuItems.push({
-      name: 'Club Chat',
-      href: '/chat',
-      icon: <MessageSquare className="w-5 h-5 text-blue-500" />,
-      showDot: hasUnreadMessages
-    });
-
+    
     const role = session.user.role?.toUpperCase();
     let dashboardLabel = 'Dashboard';
     if (role === 'ADMIN') dashboardLabel = 'Admin Panel';
@@ -158,11 +151,6 @@ const Navbar = ({ settings }: { settings: any }) => {
             {clubName.split(' ').slice(0, -1).join(' ')} <span className="text-saffron">{clubName.split(' ').slice(-1)}</span>
           </span>
         </Link>
-
-        {/* Global Search CMD+K */}
-        <div className="hidden lg:block">
-          <CommandPalette />
-        </div>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center space-x-12">

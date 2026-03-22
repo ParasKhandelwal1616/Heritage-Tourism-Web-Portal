@@ -17,7 +17,8 @@ import {
   ChevronRight,
   Map,
   ShieldAlert,
-  HardDrive
+  HardDrive,
+  MessageSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -41,36 +42,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  const userRole = session?.user?.role as string | undefined;
-  const isPrivileged = userRole === UserRole.ADMIN || userRole === UserRole.MANAGER;
+  const userRole = (session?.user?.role as string | undefined)?.toUpperCase();
+  const isAdmin = userRole === 'ADMIN';
+  const isManager = userRole === 'MANAGER';
+  const isMember = userRole === 'MEMBER';
+  const isPrivileged = isAdmin || isManager || isMember;
 
   // Regular user links
   const coreMenu = [
     { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-    { href: '/dashboard/blogs', label: 'Blog Posts', icon: BookOpen, role: [UserRole.MEMBER] },
-  ];
+    { href: '/dashboard/chat', label: 'Student Chat', icon: MessageSquare },
+    { href: '/dashboard/blogs', label: 'Blog Posts', icon: BookOpen, visible: isMember },
+  ].filter(item => item.visible !== false);
 
   // Privileged links grouped under Portal
   const managerMenu = [
     { href: '/dashboard', label: 'System Overview', icon: LayoutDashboard },
+    { href: '/dashboard/staff-chat', label: 'Club Chat', icon: MessageSquare }, // Staff Internal
+    { href: '/dashboard/chat', label: 'Student Chat', icon: ShieldAlert }, // Staff Moderation
     { href: '/dashboard/manager/events', label: 'Manage Events', icon: Calendar },
     { href: '/dashboard/manager/media', label: 'Media Library', icon: HardDrive },
     { href: '/dashboard/manager/site', label: 'Global Settings', icon: Settings },
     { href: '/dashboard/manager/blogs', label: 'Manage Blogs', icon: BookOpen },
-    { href: '/dashboard/admin/users', label: 'User Directory', icon: Users, role: [UserRole.ADMIN] },
+    { href: '/dashboard/admin/users', label: 'User Directory', icon: Users, adminOnly: true },
   ];
 
   const settingsMenu = [
     { href: '/dashboard/settings', label: 'Profile Settings', icon: Settings },
   ];
-
-  const filterItems = (items: any[]) => items.filter(item => {
-    if (!item.role) return true;
-    if (!userRole) return false;
-    return Array.isArray(item.role) 
-      ? item.role.some((r: UserRole) => String(r) === String(userRole))
-      : String(item.role) === String(userRole);
-  });
 
   return (
     <div className="flex h-screen bg-ash overflow-hidden pt-20">
@@ -91,19 +90,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Navigation Section */}
         <div className="flex-grow overflow-y-auto pt-8 pb-4">
           <div className="space-y-8">
-            {/* Core Navigation - Hidden for Privileged Users to simplify */}
+            {/* Core Navigation (Student/Member) */}
             {!isPrivileged && (
               <div>
-                <p className="px-8 text-[10px] font-black text-charcoal/30 uppercase tracking-[0.3em] mb-4">Navigation</p>
+                <p className="px-8 text-[10px] font-black text-charcoal/30 uppercase tracking-[0.3em] mb-4">Portal</p>
                 <div className="flex flex-col space-y-1">
-                  {filterItems(coreMenu).map((item) => (
+                  {coreMenu.map((item) => (
                     <SidebarLink key={item.href} {...item} active={pathname === item.href} />
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Manager Portal Section - THE ONLY POWER SOURCE for Managers/Admins */}
+            {/* Manager Portal Section */}
             {isPrivileged && (
               <div>
                 <div className="px-8 text-[10px] font-black text-emerald uppercase tracking-[0.3em] mb-4 flex items-center">
@@ -112,8 +111,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </div>
                 <div className="flex flex-col space-y-1">
                   {managerMenu.map((item) => {
-                    // Specific check for User Directory (Admin only)
-                    if (item.href.includes('admin') && userRole !== UserRole.ADMIN) return null;
+                    if (item.adminOnly && !isAdmin) return null;
                     return <SidebarLink key={item.href} {...item} active={pathname === item.href} />;
                   })}
                 </div>
