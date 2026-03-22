@@ -1,0 +1,56 @@
+[00:23:19.425] Server  ERROR   ⨯ Error: Cannot find module 'next/dist/client/components/builtin/global-not-found'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.469] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.512] Server  ERROR   ⨯ Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.554] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.751] Server  ERROR   ⨯ Error: Cannot find module 'next/dist/client/components/builtin/global-not-found'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.817] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.886] Server  ERROR   ⨯ Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js
+[00:23:19.993] Server  ERROR   Error: Cannot find module 'next/dist/pages/_error'
+Require stack:
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/on-demand-entry-handler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/dev/hot-reloader-turbopack.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-utils/setup-dev-bundler.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/router-server.js
+- /media/paras/New Volume/New folder/Club site/node_modules/next/dist/server/lib/start-server.js

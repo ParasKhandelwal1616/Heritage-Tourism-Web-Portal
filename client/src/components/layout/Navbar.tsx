@@ -1,0 +1,373 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard, ChevronDown, Settings, Users, HardDrive, MessageSquare } from 'lucide-react';
+import CommandPalette from '@/components/ui/CommandPalette';
+import { UserRole } from '@/types/user';
+import { io, Socket } from 'socket.io-client';
+
+const Navbar = ({ settings }: { settings: any }) => {
+  const { data: session, status } = useSession();
+  const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
+
+  const isHome = pathname === '/';
+  const isDashboard = pathname.startsWith('/dashboard');
+  const shouldShowSolid = isScrolled || !isHome;
+
+  const clubName = settings?.clubName || 'Heritage & Tourism Club';
+  const logoUrl = settings?.logoUrl || '/logo.jpeg';
+
+  // Handle Unread Messages with Socket.io
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      if (!socketRef.current) {
+        socketRef.current = io('http://localhost:5000');
+        
+        socketRef.current.on('receive_message', (message) => {
+          // If user is not on chat page, show red dot
+          if (window.location.pathname !== '/chat') {
+            setHasUnreadMessages(true);
+            localStorage.setItem('hasUnreadChat', 'true');
+          }
+        });
+      }
+    } else if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+    }
+
+    return () => {
+      if (socketRef.current) {
+        // We keep it open across navigation, but close on unmount or logout
+      }
+    };
+  }, [status, session]);
+
+  // Persistent Unread State
+  useEffect(() => {
+    const storedUnread = localStorage.getItem('hasUnreadChat');
+    if (storedUnread === 'true' && pathname !== '/chat') {
+      setHasUnreadMessages(true);
+    }
+    
+    if (pathname === '/chat') {
+      setHasUnreadMessages(false);
+      localStorage.removeItem('hasUnreadChat');
+    }
+  }, [pathname]);
+
+  // Scroll Lock for Mobile Menu
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const menuItems: { name: string; href: string; icon: React.ReactNode; showDot?: boolean }[] = [
+    { name: 'Events', href: '/events', icon: <Calendar className="w-5 h-5 text-emerald" /> },
+    { name: 'Blogs', href: '/blogs', icon: <BookOpen className="w-5 h-5 text-saffron" /> },
+  ];
+
+  // Dashboard sub-menu for mobile
+  const dashboardItems = [
+    { href: '/dashboard', label: 'System Overview', icon: <LayoutDashboard size={20} className="text-emerald" /> },
+    { href: '/dashboard/manager/events', label: 'Manage Events', icon: <Calendar size={20} className="text-saffron" /> },
+    { href: '/dashboard/manager/media', label: 'Media Library', icon: <HardDrive size={20} className="text-emerald" /> },
+    { href: '/dashboard/manager/site', label: 'Global Settings', icon: <Settings size={20} className="text-saffron" /> },
+    { href: '/dashboard/manager/blogs', label: 'Manage Blogs', icon: <BookOpen size={20} className="text-emerald" /> },
+    { href: '/dashboard/admin/users', label: 'User Directory', icon: <Users size={20} className="text-saffron" />, adminOnly: true },
+  ];
+
+  // Add Auth-only links
+  if (status === 'authenticated' && session?.user) {
+    
+  
+    const role = session.user.role?.toUpperCase();
+    let dashboardLabel = 'Dashboard';
+    if (role === 'ADMIN') dashboardLabel = 'Admin Panel';
+    else if (role === 'MANAGER') dashboardLabel = 'Manager Portal';
+
+    menuItems.push({ 
+      name: dashboardLabel, 
+      href: '/dashboard', 
+      icon: <LayoutDashboard className="w-5 h-5 text-emerald" /> 
+    });
+  }
+
+  return (
+    <nav 
+      style={{ top: 0, left: 0, right: 0 }}
+      className={`fixed w-full z-[100] transition-all duration-500 ${
+        shouldShowSolid ? 'bg-white shadow-md h-20' : 'bg-transparent h-24'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+        {/* Brand */}
+        <Link href="/" className="flex items-center space-x-3 group">
+          <div className="relative w-10 h-10 overflow-hidden rounded-xl border-2 border-saffron shadow-lg group-hover:scale-110 transition-transform">
+            <img 
+              src={logoUrl} 
+              alt={`${clubName} Logo`} 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <span className={`font-serif text-2xl font-black tracking-tight transition-colors duration-300 ${
+            shouldShowSolid ? 'text-charcoal' : 'text-charcoal md:text-white'
+          }`}>
+            {clubName.split(' ').slice(0, -1).join(' ')} <span className="text-saffron">{clubName.split(' ').slice(-1)}</span>
+          </span>
+        </Link>
+
+        {/* Desktop Menu */}
+        <div className="hidden lg:flex items-center space-x-12">
+          {menuItems.map((menu) => (
+            <Link 
+              key={menu.name}
+              href={menu.href} 
+              className={`flex items-center space-x-2 font-semibold text-sm uppercase tracking-widest transition-colors duration-300 group relative ${
+                shouldShowSolid ? 'text-charcoal/80 hover:text-saffron' : 'text-charcoal/80 md:text-white/80 md:hover:text-white'
+              }`}
+            >
+              <span className="opacity-0 group-hover:opacity-100 transition-opacity">
+                {menu.icon}
+              </span>
+              <span>{menu.name}</span>
+              {menu.showDot && (
+                <span className="absolute -top-1 -right-2 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+              )}
+            </Link>
+          ))}
+
+          {status === 'authenticated' ? (
+            <div className="relative" ref={profileRef}>
+              <button 
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center space-x-3 focus:outline-none"
+              >
+                <img 
+                  src={session.user?.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(session.user?.name || 'User') + '&background=random'} 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full border-2 border-saffron shadow-lg hover:scale-105 transition-transform"
+                />
+              </button>
+              
+              <AnimatePresence>
+                {isProfileOpen && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute right-0 mt-4 w-56 bg-white rounded-2xl shadow-2xl border border-black/5 p-2 overflow-hidden"
+                  >
+                    <div className="px-4 py-3 border-b border-black/5">
+                      <p className="text-sm font-bold text-charcoal truncate">{session.user?.name}</p>
+                      <p className="text-[10px] font-black text-emerald uppercase tracking-widest">{session.user?.role}</p>
+                    </div>
+                    <div className="py-2">
+                      <button 
+                        onClick={() => signOut()}
+                        className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                      >
+                        <LogOut size={16} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <Link 
+              href="/auth/signin"
+              className="bg-saffron text-white px-8 py-3 rounded-full font-bold text-sm uppercase tracking-widest hover:bg-emerald transition-all shadow-lg hover:shadow-emerald/20 active:scale-95"
+            >
+              Sign In
+            </Link>
+          )}
+        </div>
+
+        {/* Mobile Toggle */}
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className={`lg:hidden p-3 rounded-2xl transition-all duration-300 z-[1100] ${
+            isMobileMenuOpen 
+              ? 'bg-charcoal text-white shadow-xl rotate-90' 
+              : shouldShowSolid 
+                ? 'bg-charcoal/5 text-charcoal' 
+                : 'bg-white/20 text-white backdrop-blur-md'
+          }`}
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <div className="fixed inset-0 z-[99999] lg:hidden">
+            {/* Dark Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            
+            {/* Menu Content */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white shadow-[-10px_0_30px_rgba(0,0,0,0.2)] flex flex-col pt-24 px-8"
+            >
+              {/* Force Solid background layer */}
+              <div className="absolute inset-0 bg-white -z-10" />
+
+              <div className="flex flex-col space-y-8 overflow-y-auto pb-10 relative z-10">
+                <div className="pb-4 border-b border-black/5">
+                  <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em]">Main Menu</span>
+                </div>
+                {menuItems.map((menu) => (
+                  <Link 
+                    key={menu.name}
+                    href={menu.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between group"
+                  >
+                    <div className="flex items-center space-x-4">
+                      <div className="p-3 bg-ash rounded-2xl group-hover:bg-saffron/10 group-hover:text-saffron transition-all relative">
+                        {menu.icon}
+                        {menu.showDot && (
+                          <span className="absolute top-0 right-0 flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-2xl font-serif font-black text-charcoal">{menu.name}</span>
+                    </div>
+                    <div className="w-8 h-8 rounded-full border border-black/5 flex items-center justify-center opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all">
+                      <ChevronDown className="w-4 h-4 text-saffron -rotate-90" />
+                    </div>
+                  </Link>
+                ))}
+
+                {/* Dashboard Specific Section in Mobile Menu */}
+                {isDashboard && session?.user && (
+                  <div className="pt-8 border-t border-black/5 space-y-6">
+                    <span className="text-[10px] font-black text-emerald uppercase tracking-[0.3em] block mb-4">Dashboard Navigation</span>
+                    {dashboardItems.map((item) => {
+                      if (item.adminOnly && session.user.role !== UserRole.ADMIN) return null;
+                      return (
+                        <Link 
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center space-x-4 group"
+                        >
+                          <div className="p-2.5 bg-ash rounded-xl group-hover:bg-emerald/10 transition-all">
+                            {item.icon}
+                          </div>
+                          <span className="font-bold text-charcoal tracking-wide">{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+                
+                <div className="pt-8 border-t border-black/5 space-y-4">
+                  <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-[0.3em] block mb-4">Account</span>
+                  {status === 'authenticated' ? (
+                    <>
+                      <div className="flex items-center space-x-4 p-4 bg-ash rounded-2xl mb-4">
+                        <img 
+                          src={session.user?.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(session.user?.name || 'User')} 
+                          className="w-12 h-12 rounded-full border-2 border-saffron"
+                          alt="Profile"
+                        />
+                        <div>
+                          <p className="font-bold text-charcoal">{session.user?.name}</p>
+                          <p className="text-[10px] font-black text-emerald uppercase">{session.user?.role}</p>
+                        </div>
+                      </div>
+                      <Link 
+                        href="/dashboard"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="w-full flex items-center justify-center space-x-3 bg-charcoal text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-charcoal/20 active:scale-95 transition-transform"
+                      >
+                        <LayoutDashboard size={20} />
+                        <span>Dashboard Home</span>
+                      </Link>
+                      <button 
+                        onClick={() => signOut()}
+                        className="w-full flex items-center justify-center space-x-3 bg-red-50 text-red-500 py-5 rounded-2xl font-bold uppercase tracking-widest active:scale-95 transition-transform"
+                      >
+                        <LogOut size={20} />
+                        <span>Sign Out</span>
+                      </button>
+                    </>
+                  ) : (
+                    <Link 
+                      href="/auth/signin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="w-full flex items-center justify-center bg-saffron text-white py-5 rounded-2xl font-bold uppercase tracking-widest shadow-xl shadow-saffron/20 active:scale-95 transition-transform"
+                    >
+                      Sign In to Club
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {/* Decorative background element */}
+              <div className="absolute bottom-10 left-8 right-8 text-center opacity-10 pointer-events-none">
+                <p className="font-serif italic text-4xl">Heritage</p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+};
+
+export default Navbar;
