@@ -106,10 +106,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Manager Portal Section - THE ONLY POWER SOURCE for Managers/Admins */}
             {isPrivileged && (
               <div>
-                <p className="px-8 text-[10px] font-black text-emerald uppercase tracking-[0.3em] mb-4 flex items-center">
+                <div className="px-8 text-[10px] font-black text-emerald uppercase tracking-[0.3em] mb-4 flex items-center">
                   <span>Manager Portal</span>
                   <div className="ml-2 h-1 flex-grow bg-emerald/10 rounded-full" />
-                </p>
+                </div>
                 <div className="flex flex-col space-y-1">
                   {managerMenu.map((item) => {
                     // Specific check for User Directory (Admin only)
