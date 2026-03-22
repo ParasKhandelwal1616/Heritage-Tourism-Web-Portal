@@ -5,9 +5,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard, ChevronDown, Settings, Users, HardDrive } from 'lucide-react';
+import { Menu, X, Map, Calendar, BookOpen, LogOut, LayoutDashboard, ChevronDown, Settings, Users, HardDrive, MessageSquare } from 'lucide-react';
 import CommandPalette from '@/components/ui/CommandPalette';
 import { UserRole } from '@/types/user';
+import { io, Socket } from 'socket.io-client';
 
 const Navbar = ({ settings }: { settings: any }) => {
   const { data: session, status } = useSession();
@@ -15,7 +16,9 @@ const Navbar = ({ settings }: { settings: any }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const socketRef = useRef<Socket | null>(null);
 
   const isHome = pathname === '/';
   const isDashboard = pathname.startsWith('/dashboard');
@@ -23,6 +26,45 @@ const Navbar = ({ settings }: { settings: any }) => {
 
   const clubName = settings?.clubName || 'Heritage & Tourism Club';
   const logoUrl = settings?.logoUrl || '/logo.jpeg';
+
+  // Handle Unread Messages with Socket.io
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      if (!socketRef.current) {
+        socketRef.current = io('http://localhost:5000');
+        
+        socketRef.current.on('receive_message', (message) => {
+          // If user is not on chat page, show red dot
+          if (window.location.pathname !== '/chat') {
+            setHasUnreadMessages(true);
+            localStorage.setItem('hasUnreadChat', 'true');
+          }
+        });
+      }
+    } else if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+    }
+
+    return () => {
+      if (socketRef.current) {
+        // We keep it open across navigation, but close on unmount or logout
+      }
+    };
+  }, [status, session]);
+
+  // Persistent Unread State
+  useEffect(() => {
+    const storedUnread = localStorage.getItem('hasUnreadChat');
+    if (storedUnread === 'true' && pathname !== '/chat') {
+      setHasUnreadMessages(true);
+    }
+    
+    if (pathname === '/chat') {
+      setHasUnreadMessages(false);
+      localStorage.removeItem('hasUnreadChat');
+    }
+  }, [pathname]);
 
   // Scroll Lock for Mobile Menu
   useEffect(() => {
@@ -56,7 +98,7 @@ const Navbar = ({ settings }: { settings: any }) => {
     };
   }, []);
 
-  const menuItems: { name: string; href: string; icon: React.ReactNode }[] = [
+  const menuItems: { name: string; href: string; icon: React.ReactNode; showDot?: boolean }[] = [
     { name: 'Events', href: '/events', icon: <Calendar className="w-5 h-5 text-emerald" /> },
     { name: 'Blogs', href: '/blogs', icon: <BookOpen className="w-5 h-5 text-saffron" /> },
   ];
@@ -71,8 +113,16 @@ const Navbar = ({ settings }: { settings: any }) => {
     { href: '/dashboard/admin/users', label: 'User Directory', icon: <Users size={20} className="text-saffron" />, adminOnly: true },
   ];
 
-  // Add Dashboard link to main menu if authenticated
+  // Add Auth-only links
   if (status === 'authenticated' && session?.user) {
+    // Add Chat
+    menuItems.push({
+      name: 'Club Chat',
+      href: '/chat',
+      icon: <MessageSquare className="w-5 h-5 text-blue-500" />,
+      showDot: hasUnreadMessages
+    });
+
     const role = session.user.role?.toUpperCase();
     let dashboardLabel = 'Dashboard';
     if (role === 'ADMIN') dashboardLabel = 'Admin Panel';
@@ -120,7 +170,7 @@ const Navbar = ({ settings }: { settings: any }) => {
             <Link 
               key={menu.name}
               href={menu.href} 
-              className={`flex items-center space-x-2 font-semibold text-sm uppercase tracking-widest transition-colors duration-300 group ${
+              className={`flex items-center space-x-2 font-semibold text-sm uppercase tracking-widest transition-colors duration-300 group relative ${
                 shouldShowSolid ? 'text-charcoal/80 hover:text-saffron' : 'text-charcoal/80 md:text-white/80 md:hover:text-white'
               }`}
             >
@@ -128,6 +178,12 @@ const Navbar = ({ settings }: { settings: any }) => {
                 {menu.icon}
               </span>
               <span>{menu.name}</span>
+              {menu.showDot && (
+                <span className="absolute -top-1 -right-2 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+              )}
             </Link>
           ))}
 
@@ -230,8 +286,14 @@ const Navbar = ({ settings }: { settings: any }) => {
                     className="flex items-center justify-between group"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-ash rounded-2xl group-hover:bg-saffron/10 group-hover:text-saffron transition-all">
+                      <div className="p-3 bg-ash rounded-2xl group-hover:bg-saffron/10 group-hover:text-saffron transition-all relative">
                         {menu.icon}
+                        {menu.showDot && (
+                          <span className="absolute top-0 right-0 flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                          </span>
+                        )}
                       </div>
                       <span className="text-2xl font-serif font-black text-charcoal">{menu.name}</span>
                     </div>
