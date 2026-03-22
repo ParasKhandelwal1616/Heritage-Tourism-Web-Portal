@@ -168,17 +168,17 @@ export async function updateHeroVideo(videoUrl: string) {
   await dbConnect();
 
   try {
-    const config = await SiteConfig.findOneAndUpdate(
-      { key: 'heroVideo' },
+    const settings = await GlobalSettings.findOneAndUpdate(
+      {},
       { 
-        value: videoUrl,
+        heroVideoUrl: videoUrl,
         updatedBy: session.user.id
       },
       { upsert: true, new: true }
     );
 
     revalidatePath('/');
-    return { success: true, data: JSON.parse(JSON.stringify(config)) };
+    return { success: true, data: JSON.parse(JSON.stringify(settings)) };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
@@ -187,10 +187,10 @@ export async function updateHeroVideo(videoUrl: string) {
 export async function getHeroVideo() {
   await dbConnect();
   try {
-    const config = await SiteConfig.findOne({ key: 'heroVideo' });
-    return config ? config.value : '/15161691_3840_2160_30fps.mp4';
+    const settings = await GlobalSettings.findOne({});
+    return settings?.heroVideoUrl || '/15161691_3840_2160_30fps.mp4';
   } catch (error) {
-    return '/15161691_3840_2160_30fps.min.mp4'; // Fallback to a placeholder
+    return '/15161691_3840_2160_30fps.mp4'; 
   }
 }
 

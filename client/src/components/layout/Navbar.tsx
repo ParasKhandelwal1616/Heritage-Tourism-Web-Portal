@@ -116,6 +116,7 @@ const Navbar = ({ settings }: { settings: any }) => {
   // Add Auth-only links
   if (status === 'authenticated' && session?.user) {
     
+  
     const role = session.user.role?.toUpperCase();
     let dashboardLabel = 'Dashboard';
     if (role === 'ADMIN') dashboardLabel = 'Admin Panel';
