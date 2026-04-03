@@ -4,8 +4,12 @@ import Blog from '@/models/Blog';
 import { BookOpen, User, Calendar, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 async function getBlogs() {
-  await dbConnect();
+  const conn = await dbConnect();
+  if (!conn) return [];
+  
   const blogs = await Blog.find({}).populate('author', 'name image').sort({ createdAt: -1 });
   return JSON.parse(JSON.stringify(blogs));
 }

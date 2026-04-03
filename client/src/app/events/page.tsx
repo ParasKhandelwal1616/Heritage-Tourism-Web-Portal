@@ -5,8 +5,12 @@ import { EventType } from '@/types/event';
 import { Calendar, MapPin, ExternalLink, Globe, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 async function getEvents() {
-  await dbConnect();
+  const conn = await dbConnect();
+  if (!conn) return [];
+  
   const events = await Event.find({}).sort({ date: -1 });
   return JSON.parse(JSON.stringify(events));
 }
