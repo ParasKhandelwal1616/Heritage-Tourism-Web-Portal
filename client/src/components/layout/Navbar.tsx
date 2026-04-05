@@ -31,7 +31,8 @@ const Navbar = ({ settings }: { settings: any }) => {
   useEffect(() => {
     if (status === 'authenticated' && session?.user) {
       if (!socketRef.current) {
-        socketRef.current = io('http://localhost:5000');
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+        socketRef.current = io(apiUrl);
         
         socketRef.current.on('receive_message', (message) => {
           // If user is not on chat page, show red dot
