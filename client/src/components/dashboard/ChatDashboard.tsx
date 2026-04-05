@@ -40,23 +40,24 @@ export default function ChatDashboard({ room, title }: ChatDashboardProps) {
   const isMember = role === 'MEMBER';
 
   useEffect(() => {
-    const newSocket = io('http://localhost:5000');
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+    const newSocket = io(apiUrl);
     setSocket(newSocket);
 
     // Join the specific room
     newSocket.emit('join_room', room);
 
     // Initial Data
-    fetch(`http://localhost:5000/api/chat/messages/${room}`)
+    fetch(`${apiUrl}/api/chat/messages/${room}`)
       .then(res => res.json())
       .then(data => setMessages(data));
 
-    fetch(`http://localhost:5000/api/polls/latest/${room}`)
+    fetch(`${apiUrl}/api/polls/latest/${room}`)
       .then(res => res.json())
       .then(data => setPoll(data));
 
     if (room === 'student') {
-      fetch('http://localhost:5000/api/settings/chat-config')
+      fetch(`${apiUrl}/api/settings/chat-config`)
         .then(res => res.json())
         .then(data => setCanChat(data.canChat));
     }

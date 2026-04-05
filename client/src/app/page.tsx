@@ -12,9 +12,10 @@ export default function LandingPage() {
     const fetchData = async () => {
       try {
         // Fetch stats and settings from our new Express API
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         const [statsRes, settingsRes] = await Promise.all([
-          fetch('http://localhost:5000/api/blogs'), // Just an example, we can create a dedicated stats endpoint
-          fetch('http://localhost:5000/api/settings')
+          fetch(`${apiUrl}/api/blogs`), // Just an example, we can create a dedicated stats endpoint
+          fetch(`${apiUrl}/api/settings`)
         ]);
 
         const blogs = await statsRes.json();
