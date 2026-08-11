@@ -27,7 +27,7 @@ export default function LandingPage() {
           blogs: blogs.length || 0
         });
 
-        if (settings?.heroVideoUrl) {
+        if (settings?.heroVideoUrl && settings.heroVideoUrl.trim() !== '') {
           setVideoUrl(settings.heroVideoUrl);
         }
       } catch (error) {

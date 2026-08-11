@@ -18,7 +18,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: '*', // Adjust for production
+    origin: process.env.CORS_ORIGIN || '*', // Configured for production
     methods: ['GET', 'POST'],
   },
 });
@@ -26,7 +26,9 @@ const io = new Server(httpServer, {
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*'
+}));
 app.use(express.json());
 
 // Connect to Database

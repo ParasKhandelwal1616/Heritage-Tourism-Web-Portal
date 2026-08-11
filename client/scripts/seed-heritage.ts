@@ -1,6 +1,6 @@
 import dbConnect from '@/lib/db';
-import HeritageSite from './src/models/HeritageSite';
-import { SiteType, SiteScale, SiteStatus } from './src/types/heritage';
+import HeritageSite from '../src/models/HeritageSite';
+import { SiteType, SiteScale, SiteStatus } from '../src/types/heritage';
 
 const sites = [
   {

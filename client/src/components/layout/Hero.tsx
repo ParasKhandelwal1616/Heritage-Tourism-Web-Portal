@@ -14,7 +14,7 @@ const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
       {/* Immersive Video Placeholder */}
       <div className="absolute inset-0 z-0">
         <video
-          key={videoUrl}
+          key={videoUrl || '/15161691_3840_2160_30fps.mp4'}
           autoPlay
           loop
           muted
@@ -22,7 +22,7 @@ const Hero = ({ videoUrl = '/15161691_3840_2160_30fps.mp4' }: HeroProps) => {
           className="w-full h-full object-cover scale-105 filter brightness-50"
         >
           {/* Using your high-quality local video background */}
-          <source src={videoUrl} type="video/mp4" />
+          <source src={videoUrl || '/15161691_3840_2160_30fps.mp4'} type="video/mp4" />
         </video>
         {/* Overlay Gradients */}
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-transparent to-charcoal/40 opacity-80" />

@@ -102,6 +102,7 @@ const Navbar = ({ settings }: { settings: any }) => {
   const menuItems: { name: string; href: string; icon: React.ReactNode; showDot?: boolean }[] = [
     { name: 'Events', href: '/events', icon: <Calendar className="w-5 h-5 text-emerald" /> },
     { name: 'Blogs', href: '/blogs', icon: <BookOpen className="w-5 h-5 text-saffron" /> },
+    { name: 'AI Guide', href: '/ai-guide', icon: <Map className="w-5 h-5 text-saffron" /> },
   ];
 
   // Dashboard sub-menu for mobile
