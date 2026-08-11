@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+import path from 'path';
+dotenv.config({ path: path.join(__dirname, '../.env.local') });
 import dbConnect from '@/lib/db';
 import HeritageSite from '../src/models/HeritageSite';
 import { SiteType, SiteScale, SiteStatus } from '../src/types/heritage';
